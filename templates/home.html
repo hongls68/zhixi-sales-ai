@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智析 AI - 用户中心</title>
+    <style>
+      :root{--primary-blue:#1A8CFF;--primary-gradient:linear-gradient(180deg,#0F67FE 0%,#2AD1F8 100%);--text-dark:#242424;--text-muted:#666666;--bg-white:#FFFFFF;--btn-dark:#242424;--btn-dark-hover:#151515;--border-color:#E5E5E5;--bg-light:#F8F9FA;--success:#52C41A;--error:#FF4D4F}
+      *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+      body{font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f5;color:var(--text-dark);line-height:1.6}
+      .container{min-height:100vh;display:flex;flex-direction:column}
+      /* 顶部导航 */
+      .header{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+      .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+      .logo-icon{width:32px;height:32px;background:var(--primary-gradient);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:14px}
+      .logo-text{font-size:18px;font-weight:700}
+      .nav-links{display:flex;align-items:center;gap:32px}
+      .nav-link{color:var(--text-muted);text-decoration:none;font-size:14px;transition:color .3s}
+      .nav-link:hover,.nav-link.active{color:var(--text-dark)}
+      .user-menu{display:flex;align-items:center;gap:16px}
+      .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+      .btn{padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-size:14px;transition:all .3s}
+      .btn-primary{background:var(--primary-blue);color:#fff}
+      .btn-primary:hover{background:#0d6efd}
+      .btn-outline{border:1px solid var(--border-color);background:#fff;color:var(--text-dark)}
+      .btn-outline:hover{border-color:var(--primary-blue);color:var(--primary-blue)}
+      /* 主体内容 */
+      .main{flex:1;display:flex;padding:40px;gap:40px;max-width:1400px;margin:0 auto;width:100%}
+      .sidebar{width:240px;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.05);height:fit-content;position:sticky;top:100px}
+      .sidebar-menu{list-style:none}
+      .sidebar-item{padding:12px 16px;border-radius:8px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;color:var(--text-muted);transition:all .3s}
+      .sidebar-item:hover{background:var(--bg-light);color:var(--text-dark)}
+      .sidebar-item.active{background:var(--primary-blue);color:#fff}
+      .sidebar-icon{width:20px;height:20px}
+      .content{flex:1;background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+      .page-title{font-size:24px;font-weight:700;margin-bottom:24px}
+      /* 表单样式 */
+      .form-group{margin-bottom:20px}
+      .form-label{display:block;margin-bottom:8px;font-size:14px;font-weight:500}
+      .form-input{width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;transition:border-color .3s}
+      .form-input:focus{outline:none;border-color:var(--primary-blue)}
+      .form-hint{font-size:12px;color:var(--text-muted);margin-top:4px}
+      .form-error{color:var(--error);font-size:12px;margin-top:4px}
+      .btn-block{width:100%;padding:14px;font-size:16px}
+      /* 登录注册切换 */
+      .auth-container{max-width:400px;margin:60px auto;padding:40px;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+      .auth-tabs{display:flex;margin-bottom:32px}
+      .auth-tab{flex:1;padding:16px;text-align:center;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);transition:all .3s}
+      .auth-tab.active{border-color:var(--primary-blue);color:var(--primary-blue)}
+      .auth-form{display:none}
+      .auth-form.active{display:block}
+      .auth-divider{display:flex;align-items:center;margin:24px 0}
+      .auth-divider::before,.auth-divider::after{content:'';flex:1;border-top:1px solid var(--border-color)}
+      .auth-divider span{padding:0 16px;color:var(--text-muted);font-size:14px}
+      .social-login{display:flex;gap:16px}
+      .social-btn{flex:1;padding:12px;border:1px solid var(--border-color);border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px}
+      .btn-primary{background:var(--primary-blue);color:#fff}
+      /* 统计卡片 */
+      .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:32px}
+      .stat-card{background:var(--bg-light);border-radius:12px;padding:24px}
+      .stat-value{font-size:32px;font-weight:700;margin-bottom:8px}
+      .stat-label{font-size:14px;color:var(--text-muted)}
+      .stat-trend{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:12px}
+      .trend-up{color:var(--success)}
+      .trend-down{color:var(--error)}
+      /* 表格样式 */
+      .data-table{width:100%;border-collapse:collapse}
+      .data-table th,.data-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border-color)}
+      .data-table th{background:var(--bg-light);font-weight:600;font-size:14px}
+      .data-table tr:hover{background:var(--bg-light)}
+      .status-badge{padding:4px 12px;border-radius:12px;font-size:12px}
+      .status-success{background:#f6ffed;color:var(--success)}
+      .status-pending{background:#fffbe6;color:#faad14}
+      .status-error{background:#fff2f0;color:var(--error)}
+      /* 上传区域 */
+      .upload-area{border:2px dashed var(--border-color);border-radius:12px;padding:60px;text-align:center;cursor:pointer;transition:all .3s}
+      .upload-area:hover{border-color:var(--primary-blue);background:var(--bg-light)}
+      .upload-icon{width:64px;height:64px;margin:0 auto 16px}
+      .upload-title{font-size:18px;font-weight:600;margin-bottom:8px}
+      .upload-hint{color:var(--text-muted);font-size:14px}
+      .file-list{margin-top:24px}
+      .file-item{display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--bg-light);border-radius:8px;margin-bottom:12px}
+      .file-info{display:flex;align-items:center;gap:12px}
+      .file-icon{width:40px;height:40px;background:#e6f7ff;border-radius:8px;display:flex;align-items:center;justify-content:center}
+      .file-name{font-weight:500}
+      .file-size{font-size:12px;color:var(--text-muted)}
+      .file-actions{display:flex;gap:8px}
+      /* 响应式 */
+      @media(max-width:768px){
+        .main{flex-direction:column;padding:20px}
+        .sidebar{width:100%;position:static}
+        .stats-grid{grid-template-columns:repeat(2,1fr)}
+        .nav-links{display:none}
+      }
+    </style>
+    <!-- [新增] 登录状态管理脚本 -->
+    <script type="module">
+        import { isLoggedIn, getUserInfo, logout } from './static/js/auth.js';
+
+        // 登录守卫：未登录则跳转到登录页
+        if (!isLoggedIn()) {
+            window.location.href = '/login?redirect=/home';
+        }
+
+        // 暴露给全局使用
+        window.authUtils = { isLoggedIn, getUserInfo, logout };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <header class="header">
+            <a href="/" class="logo">
+                <div class="logo-icon">智</div>
+                <span class="logo-text">智析 AI</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">首页</a>
+                <a href="#features" class="nav-link">功能</a>
+                <a href="#pricing" class="nav-link">价格</a>
+                <a href="#help" class="nav-link">帮助</a>
+            </nav>
+            <div class="user-menu" id="userMenu">
+                <span id="userName">用户</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <!-- [新增] 下拉菜单 -->
+                <div class="user-dropdown" id="userDropdown" style="display:none; position:absolute; top:100%; right:0; background:#fff; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.1); padding:8px 0; min-width:150px; z-index:1000;">
+                    <div style="padding:12px 16px; border-bottom:1px solid #E5E7EB; font-size:14px; color:#6B7280;" id="dropdownUserInfo">
+                        用户信息
+                    </div>
+                    <a href="#" onclick="handleLogout()" style="display:block; padding:12px 16px; color:#EF4444; text-decoration:none; font-size:14px; cursor:pointer;">
+                        退出登录
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主体内容 -->
+        <main class="main">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active" onclick="showPage('dashboard')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        仪表盘
+                    </li>
+                    <li class="sidebar-item" onclick="showPage('upload')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        上传录音
+                    </li>
+                    <li class="sidebar-item" onclick="showPage('analysis')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        数据分析
+                    </li>
+                    <li class="sidebar-item" onclick="showPage('reports')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        报告管理
+                    </li>
+                    <li class="sidebar-item" onclick="showPage('templates')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        模板中心
+                    </li>
+                    <li class="sidebar-item" onclick="showPage('settings')">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        设置
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- 内容区域 -->
+            <div class="content">
+                <!-- 仪表盘页面 -->
+                <div id="dashboard-page">
+                    <h1 class="page-title">欢迎回来，<span id="welcomeName">用户</span>!</h1>
+                    
+                    <!-- 统计卡片 -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalRecordings">0</div>
+                            <div class="stat-label">总录音数</div>
+                            <div class="stat-trend trend-up">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                                本月 +12%
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalAnalysis">0</div>
+                            <div class="stat-label">已分析</div>
+                            <div class="stat-trend trend-up">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                                完成率 95%
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalReports">0</div>
+                            <div class="stat-label">生成报告</div>
+                            <div class="stat-trend trend-up">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                                本月 +8
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="saveTime">2.5h</div>
+                            <div class="stat-label">节省时间</div>
+                            <div class="stat-trend trend-up">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                                每周
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最近录音 -->
+                    <h2 style="font-size:18px;margin-bottom:16px">最近录音</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>上传时间</th>
+                                <th>时长</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentRecordings">
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:var(--text-muted)">暂无录音，请上传新录音</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 上传页面 -->
+                <div id="upload-page" style="display:none">
+                    <h1 class="page-title">上传录音</h1>
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-title">点击或拖拽文件到此处上传</div>
+                        <div class="upload-hint">支持 MP3、WAV、M4A 格式，最大 500MB</div>
+                        <input type="file" id="fileInput" accept="audio/*" style="display:none" onchange="handleFileSelect(event)">
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <!-- 分析页面 -->
+                <div id="analysis-page" style="display:none">
+                    <h1 class="page-title">数据分析</h1>
+                    <div style="text-align:center;padding:60px;color:var(--text-muted)">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom:16px">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <p>选择录音进行分析</p>
+                    </div>
+                </div>
+
+                <!-- 报告页面 -->
+                <div id="reports-page" style="display:none">
+                    <h1 class="page-title">报告管理</h1>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>报告名称</th>
+                                <th>生成时间</th>
+                                <th>类型</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsList">
+                            <tr>
+                                <td colspan="4" style="text-align:center;color:var(--text-muted)">暂无报告</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 模板页面 -->
+                <div id="templates-page" style="display:none">
+                    <h1 class="page-title">模板中心</h1>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+                        <div style="background:var(--bg-light);border-radius:12px;padding:24px;text-align:center">
+                            <div style="font-size:48px;margin-bottom:12px">📊</div>
+                            <h3 style="margin-bottom:8px">销售日报</h3>
+                            <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">每日销售数据汇总</p>
+                            <button class="btn btn-primary">使用模板</button>
+                        </div>
+                        <div style="background:var(--bg-light);border-radius:12px;padding:24px;text-align:center">
+                            <div style="font-size:48px;margin-bottom:12px">📝</div>
+                            <h3 style="margin-bottom:8px">会议记录</h3>
+                            <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">自动整理会议要点</p>
+                            <button class="btn btn-primary">使用模板</button>
+                        </div>
+                        <div style="background:var(--bg-light);border-radius:12px;padding:24px;text-align:center">
+                            <div style="font-size:48px;margin-bottom:12px">📈</div>
+                            <h3 style="margin-bottom:8px">周报分析</h3>
+                            <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">周度销售趋势分析</p>
+                            <button class="btn btn-primary">使用模板</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 设置页面 -->
+                <div id="settings-page" style="display:none">
+                    <h1 class="page-title">设置</h1>
+                    <div style="max-width:500px">
+                        <div class="form-group">
+                            <label class="form-label">用户名</label>
+                            <input type="text" class="form-input" id="settingsUsername" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-input" id="settingsEmail" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">修改密码</label>
+                            <input type="password" class="form-input" placeholder="输入新密码">
+                            <div class="form-hint">最少 8 个字符</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="updateProfile()">保存更改</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    // 页面切换
+    function showPage(page) {
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        
+        document.getElementById('dashboard-page').style.display = 'none';
+        document.getElementById('upload-page').style.display = 'none';
+        document.getElementById('analysis-page').style.display = 'none';
+        document.getElementById('reports-page').style.display = 'none';
+        document.getElementById('templates-page').style.display = 'none';
+        document.getElementById('settings-page').style.display = 'none';
+        
+        document.getElementById(page + '-page').style.display = 'block';
+    }
+
+    // 文件选择处理
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const fileList = document.getElementById('fileList');
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">🎵</div>
+                    <div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn btn-primary" onclick="uploadFile('${file.name}')">上传</button>
+                    <button class="btn btn-outline" onclick="this.parentElement.parentElement.remove()">删除</button>
+                </div>
+            `;
+            fileList.appendChild(fileItem);
+        }
+    }
+
+    // 上传文件
+    async function uploadFile(filename) {
+        const formData = new FormData();
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('上传成功！');
+                    updateStats();
+                } else {
+                    alert('上传失败：' + result.message);
+                }
+            } catch (error) {
+                alert('上传失败：' + error.message);
+            }
+        }
+    }
+
+    // 更新统计
+    function updateStats() {
+        const stats = JSON.parse(localStorage.getItem('stats') || '{"recordings":0,"analysis":0,"reports":0}');
+        document.getElementById('totalRecordings').textContent = stats.recordings;
+        document.getElementById('totalAnalysis').textContent = stats.analysis;
+        document.getElementById('totalReports').textContent = stats.reports;
+    }
+
+    // 更新资料
+    function updateProfile() {
+        alert('设置已保存');
+    }
+
+    // [修改] 退出登录 - 使用新的 auth 工具
+    function handleLogout() {
+        if (confirm('确定要退出登录吗？')) {
+            if (window.authUtils && window.authUtils.logout) {
+                window.authUtils.logout();
+            } else {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/';
+            }
+        }
+    }
+
+    // [修改] 检查登录状态 - 使用新的 auth 工具
+    function checkAuth() {
+        // 等待 auth 模块加载
+        const checkInterval = setInterval(() => {
+            if (window.authUtils) {
+                clearInterval(checkInterval);
+
+                if (!window.authUtils.isLoggedIn()) {
+                    window.location.href = '/login?redirect=/home';
+                    return;
+                }
+
+                const user = window.authUtils.getUserInfo();
+                const displayName = user.nickname || user.phone || '用户';
+
+                document.getElementById('userName').textContent = displayName;
+                document.getElementById('welcomeName').textContent = displayName;
+                document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
+                document.getElementById('dropdownUserInfo').textContent = user.phone || '用户';
+
+                // 添加下拉菜单交互
+                const userMenu = document.getElementById('userMenu');
+                const dropdown = document.getElementById('userDropdown');
+
+                userMenu.addEventListener('click', () => {
+                    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                });
+
+                // 点击其他地方关闭下拉菜单
+                document.addEventListener('click', (e) => {
+                    if (!userMenu.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        }, 100);
+
+        // 5秒后停止检查，避免无限循环
+        setTimeout(() => clearInterval(checkInterval), 5000);
+    }
+
+    // 页面加载时检查
+    window.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>

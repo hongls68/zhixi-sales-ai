@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析详情 - 智析销售AI</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+      .app-layout{display:flex;min-height:100vh;background:var(--bg-secondary)}
+      .sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-color);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+      .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border-color)}
+      .sidebar-logo img{width:28px;height:28px}.sidebar-logo span{font-size:var(--text-base);font-weight:700}
+      .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px;text-decoration:none}
+      .nav-item:hover{background:var(--gray-100);color:var(--text-primary)}
+      .nav-item.active{background:var(--primary-50);color:var(--primary-600);font-weight:500}
+      .nav-item svg{width:18px;height:18px;flex-shrink:0}
+      .nav-section-title{font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);padding:8px 12px;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px}
+      .main-area{margin-left:240px;flex:1;display:flex;flex-direction:column}
+      .topbar{height:56px;background:var(--bg-primary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
+      .content-area{flex:1;padding:24px;overflow-y:auto}
+      .analysis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+      .analysis-title{font-size:var(--text-2xl);font-weight:700;color:var(--text-primary)}
+      .analysis-meta{display:flex;gap:16px;margin-top:8px;font-size:var(--text-sm);color:var(--text-secondary)}
+      .analysis-actions{display:flex;gap:8px}
+      .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+      .section-card{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);margin-bottom:20px}
+      .section-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-color)}
+      .section-title{font-size:var(--text-base);font-weight:600;color:var(--text-primary)}
+      .section-body{padding:20px}
+      .content-box{background:var(--gray-50);border-radius:var(--radius-md);padding:20px;font-size:var(--text-sm);line-height:1.8;color:var(--text-primary);white-space:pre-wrap;max-height:400px;overflow-y:auto}
+      .score-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
+      .score-value{font-size:var(--text-4xl);font-weight:800;color:var(--text-white)}
+      .score-label{font-size:var(--text-xs);color:rgba(255,255,255,0.8)}
+      .insight-list{display:flex;flex-direction:column;gap:12px}
+      .insight-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--gray-50);border-radius:var(--radius-md)}
+      .insight-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+      .insight-icon.success{background:var(--success-light)}
+      .insight-icon.warning{background:var(--warning-light)}
+      .insight-icon.info{background:var(--primary-100)}
+      .insight-text{font-size:var(--text-sm);color:var(--text-primary);line-height:1.6}
+      .keywords{display:flex;flex-wrap:wrap;gap:8px}
+      .keyword{padding:6px 14px;background:var(--primary-50);color:var(--primary-600);border-radius:20px;font-size:var(--text-sm);font-weight:500}
+      .sentiment-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px}
+      .sentiment-positive{background:var(--success)}
+      .sentiment-neutral{background:var(--warning)}
+      .sentiment-negative{background:var(--error)}
+      .sentiment-labels{display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--text-tertiary)}
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo"><img src="static/images/logo.svg" alt="智析销售AI"><span>智析销售AI</span></a>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">主菜单</div>
+                <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
+                <a class="nav-item" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>分析记录</a>
+                <a class="nav-item" href="team.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>团队协作</a>
+                <div class="nav-section-title">其他</div>
+                <a class="nav-item" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4"></path></svg>设置</a>
+            </nav>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:16px">
+                    <a href="dashboard.html" class="btn btn-ghost btn-sm">← 返回工作台</a>
+                </div>
+            </header>
+
+            <div class="content-area" id="analysisContent">
+                <!-- 动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="static/js/auth.js"></script>
+    <script src="static/js/api.js"></script>
+    <script src="static/js/utils.js"></script>
+    <script>
+        if(!window.auth.isLoggedIn()){window.location.href='login.html';}
+
+        function loadAnalysis() {
+            var params = new URLSearchParams(window.location.search);
+            var id = params.get('id') || '1';
+
+            window.api.mockGetAnalysisDetail(id).then(function(data) {
+                var scoreColorHex = window.utils.getScoreColorHex(data.analysis.intent_score);
+                var sentimentWidth = data.analysis.sentiment === 'positive' ? 70 : (data.analysis.sentiment === 'neutral' ? 50 : 30);
+
+                var html = '';
+                html += '<div class="analysis-header fade-in">';
+                html += '<div><h1 class="analysis-title">' + data.title + '</h1>';
+                html += '<div class="analysis-meta"><span>' + window.utils.getAnalysisTypeName(data.type) + '</span>';
+                html += '<span>' + window.utils.formatDate(data.created_at) + '</span>';
+                html += '<span class="badge badge-success">已完成</span></div></div>';
+                html += '<div class="analysis-actions">';
+                html += '<button class="btn btn-secondary" onclick="window.utils.showToast(\'已复制链接\',\'success\')">分享</button>';
+                html += '<button class="btn btn-primary" onclick="window.utils.showToast(\'PDF导出功能即将上线\',\'info\')">导出PDF</button>';
+                html += '</div></div>';
+
+                // 评分和关键词
+                html += '<div class="grid-2 fade-in-up">';
+                html += '<div class="section-card"><div class="section-header"><span class="section-title">📊 综合评分</span></div>';
+                html += '<div class="section-body" style="text-align:center;padding:30px">';
+                html += '<div style="position:relative;width:150px;height:150px;margin:0 auto 16px"><canvas id="scoreChart"></canvas>';
+                html += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">';
+                html += '<div style="font-size:36px;font-weight:800;color:' + scoreColorHex + '">' + data.analysis.intent_score + '</div>';
+                html += '<div style="font-size:12px;color:#6B7280">意向评分</div></div></div>';
+                html += '<div style="margin-top:20px"><div style="font-size:14px;font-weight:600;margin-bottom:8px">客户情绪</div>';
+                html += '<div class="sentiment-bar"><div class="sentiment-positive" style="width:' + sentimentWidth + '%"></div>';
+                html += '<div class="sentiment-neutral" style="width:' + (100 - sentimentWidth) + '%"></div></div>';
+                html += '<div class="sentiment-labels"><span>消极</span><span>中性</span><span>积极</span></div></div></div></div>';
+
+                // 关键词
+                html += '<div class="section-card"><div class="section-header"><span class="section-title">🏷️ 关键词</span></div>';
+                html += '<div class="section-body"><div class="keywords" style="margin-bottom:20px">';
+                data.analysis.keywords.forEach(function(k) {
+                    html += '<span class="keyword">' + k + '</span>';
+                });
+                html += '</div><div style="height:180px"><canvas id="keywordsChart"></canvas></div></div></div>';
+                html += '</div>';
+
+                // 关键洞察
+                html += '<div class="section-card fade-in-up"><div class="section-header"><span class="section-title">🎯 关键洞察</span></div>';
+                html += '<div class="section-body"><div class="insight-list">';
+                data.analysis.key_points.forEach(function(p) {
+                    html += '<div class="insight-item"><div class="insight-icon success">✓</div><div class="insight-text">' + p + '</div></div>';
+                });
+                html += '</div></div></div>';
+
+                // 行动建议
+                html += '<div class="section-card fade-in-up"><div class="section-header"><span class="section-title">💡 行动建议</span></div>';
+                html += '<div class="section-body"><div class="insight-list">';
+                data.analysis.suggestions.forEach(function(s, i) {
+                    html += '<div class="insight-item"><div class="insight-icon info">' + (i + 1) + '</div><div class="insight-text">' + s + '</div></div>';
+                });
+                html += '</div></div></div>';
+
+                // 原始对话
+                html += '<div class="section-card fade-in-up"><div class="section-header"><span class="section-title">📝 原始对话</span></div>';
+                html += '<div class="section-body"><div class="content-box">' + data.content + '</div></div></div>';
+
+                document.getElementById('analysisContent').innerHTML = html;
+
+                // 初始化图表
+                initCharts(data);
+            });
+        }
+
+        function initCharts(data) {
+            // 评分环形图
+            var scoreCanvas = document.getElementById('scoreChart');
+            if (scoreCanvas && typeof Chart !== 'undefined') {
+                var score = data.analysis.intent_score;
+                var scoreColor = window.utils.getScoreColorHex(score);
+                new Chart(scoreCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [score, 100 - score],
+                            backgroundColor: [scoreColor, '#F3F4F6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '75%',
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            }
+
+            // 关键词柱状图
+            var keywordsCanvas = document.getElementById('keywordsChart');
+            if (keywordsCanvas && typeof Chart !== 'undefined') {
+                var keywords = data.analysis.keywords.slice(0, 5);
+                var counts = keywords.map(function() { return Math.floor(Math.random() * 10 + 3); });
+                new Chart(keywordsCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: keywords,
+                        datasets: [{
+                            label: '出现次数',
+                            data: counts,
+                            backgroundColor: '#3B82F6',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 3 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        loadAnalysis();
+    </script>
+                        <button class="btn btn-primary" onclick="window.utils.showToast('PDF导出功能即将上线','info')">导出PDF</button>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="section-card">
+                        <div class="section-header"><span class="section-title">📊 综合评分</span></div>
+                        <div class="section-body" style="text-align:center">
+                            <div class="score-circle" style="background:conic-gradient(${scoreColor} 0% ${data.analysis.intent_score}%, var(--gray-200) ${data.analysis.intent_score}% 100%)">
+        loadAnalysis();
+    </script>
+</body>
+</html>

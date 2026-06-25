@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>听脑AI - 你的AI录音助手</title>
+
+    <!-- DNS 预解析，减少跨域请求延迟 -->
+    <link rel="dns-prefetch" href="//api.itingnao.com">
+    <link rel="dns-prefetch" href="//cn-hangzhou.log.aliyuncs.com">
+    <link rel="preconnect" href="https://api.itingnao.com" crossorigin>
+
+    <!-- 首屏关键 CSS 内联，消除渲染阻塞 -->
+    <style>
+      :root{--primary-blue:#1A8CFF;--text-dark:#242424;--text-muted:#2C2C2C;--bg-white:#FFFFFF;--btn-dark:#242424;--btn-dark-hover:#151515}
+      *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+      html{font-size:16px;overflow-x:hidden}
+      body{font-family:"HarmonyOS Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background-color:#fff;color:var(--text-dark);overflow-x:hidden}
+      a{text-decoration:none;color:inherit}
+      .page-wrapper{position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:156px 0 72px;gap:80px;width:100%;margin:0 auto;min-height:100vh;background:#fff;overflow:hidden}
+      .header{display:flex;justify-content:space-between;align-items:center;width:100%;padding:24px 40px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:9999;background:transparent;transition:all .3s ease}
+      .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+      .logo-text{font-size:1.15rem;font-weight:700;letter-spacing:.5px;margin:0;padding:0;line-height:inherit}
+      .nav-desktop{display:flex;align-items:center;gap:40px;margin-left:20px}
+      .nav-item{font-size:.95rem;color:var(--text-dark);display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:500}
+      .btn{border:none;border-radius:8px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;position:relative;overflow:hidden;z-index:1;width:112px;height:40px;font-size:16px}
+      .btn-dark{background-color:var(--btn-dark);color:#fff}
+      .nav-btn{font-size:.95rem}
+      .hero-btn-wrapper{position:relative;display:inline-block;z-index:2;margin-top:54px}
+      .hero-btn{width:160px;height:54px;font-size:24px;border-radius:12px;background-color:var(--btn-dark);color:#fff;border:none;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:2;overflow:hidden}
+      .hero-btn-glow{position:absolute;top:20%;left:5%;width:90%;height:100%;background:linear-gradient(90deg,#0f67fe 0%,#2ad1f8 25%,#667eea 50%,#4facfe 75%,#0f67fe 100%);background-size:200% auto;filter:blur(15px);opacity:.6;border-radius:inherit;z-index:1}
+      .menu-toggle{display:none;background:none;border:none;cursor:pointer;width:32px;height:32px;position:relative;z-index:1000}
+      .hamburger,.hamburger::before,.hamburger::after{display:block;width:24px;height:2px;background-color:var(--text-dark);position:absolute;left:4px;transition:all .3s ease}
+      .hamburger{top:15px}
+      .hamburger::before{content:'';top:-7px}
+      .hamburger::after{content:'';top:7px}
+      .main-content{display:flex;flex-direction:column;align-items:center;width:100%;max-width:1280px;gap:60px;padding:0 40px;flex:1;margin:0 auto;box-sizing:border-box}
+      .hero{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:900px;z-index:2}
+      .hero-title{font-size:clamp(32px,5vw,54px);font-weight:700;line-height:1.3;letter-spacing:-.5px;color:var(--text-dark);margin-bottom:16px}
+      .hero-subtitle{font-size:clamp(14px,1.5vw,18px);color:var(--text-muted);line-height:1.6;margin-bottom:0}
+      .text-blue{background:linear-gradient(180deg,#0F67FE 0%,#2AD1F8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+      .showcase{width:100%;max-width:1280px;aspect-ratio:16/9;border-radius:32px;background:linear-gradient(180deg,#E6F3FF 0%,#fff 100%);border:8px solid #fff;box-shadow:0 20px 60px rgba(0,50,150,.08),inset 0 0 0 1px rgba(26,140,255,.1);position:relative;overflow:hidden;will-change:transform}
+      .showcase-inner{width:100%;height:100%;overflow:hidden;border-radius:24px}
+      .showcase-inner video,.showcase-inner img{width:100%;height:100%;object-fit:cover;display:block}
+      .top-ellipse{position:absolute;pointer-events:none;z-index:0;filter:blur(60px);max-width:100vw;overflow:hidden}
+      .top-ellipse svg{width:100%;height:100%;display:block}
+      .top-ellipse-1{width:484px;height:295px;left:0;top:-155px;background:linear-gradient(181deg,#D9EAFF 64%,#F0F8FF 79%)}
+      .top-ellipse-2{width:442px;height:233px;left:427px;top:-116px;background:#C9E3FF}
+      .top-ellipse-3{width:595px;height:230px;left:756px;top:-145px;background:#BBF1FF}
+      .header-right{display:flex;align-items:center;gap:16px}
+      .mobile-nav{display:none}
+      @media(max-width:768px){
+        .page-wrapper{padding:100px 0 40px;gap:40px}
+        .header{padding:16px 20px}
+        .nav-desktop{display:none}
+        .menu-toggle{display:flex;align-items:center;justify-content:center}
+        .main-content{padding:0 20px;gap:40px}
+        .hero-title{font-size:clamp(28px,7vw,40px)}
+        .showcase{border-radius:16px;border-width:4px}
+        .hero-btn{width:130px;height:46px;font-size:18px}
+        .hero-btn-wrapper{margin-top:32px}
+        .btn{width:100px;height:36px;font-size:14px}
+      }
+      .back-to-top-btn {
+        position: fixed;
+        right: 24px;
+        bottom: 32px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #fff;
+        color: var(--text-muted);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(16px);
+        transition: all 0.3s ease;
+      }
+      .back-to-top-btn.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+      .back-to-top-btn:hover {
+        color: var(--primary-blue);
+        box-shadow: 0 6px 20px rgba(26,140,255,0.15);
+      }
+    </style>
+    <!-- 完整 CSS 异步加载，不阻塞首屏渲染 -->
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="style.css"></noscript>
+
+    <!-- LCP 关键图：优先预加载 WebP 版封面图（21KB vs 原 414KB） -->
+    <link rel="preload" href="./hero-poster.webp" as="image" type="image/webp">
+
+    <!-- 埋点 SDK 异步加载，不阻塞渲染 -->
+    <script src="libs/web-track-browser.global.js" defer></script>
+    <!-- 主逻辑脚本 defer，HTML 解析完成后执行 -->
+    <script src="script.js" defer></script>
+    <!-- [新增] 首页登录状态检查脚本 -->
+    <script src="static/js/homepage-auth.js" defer></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- 顶部光晕 -->
+        <div class="top-ellipse top-ellipse-1">
+            <svg width="649" height="260" viewBox="0 0 649 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_151)">
+                    <ellipse cx="286.223" cy="-7.33165" rx="242.223" ry="147.332" fill="url(#paint0_linear_28032_151)"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_151" x="-76" y="-274.663" width="724.445" height="534.663" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_151"/>
+                    </filter>
+                    <linearGradient id="paint0_linear_28032_151" x1="286.936" y1="35.1552" x2="285.821" y2="139.996" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#D9EAFF"/>
+                        <stop offset="0.412203" stop-color="#F0F8FF"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="top-ellipse top-ellipse-2">
+            <svg width="682" height="238" viewBox="0 0 682 238" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_153)">
+                    <ellipse cx="340.76" cy="0.461792" rx="220.76" ry="116.692" fill="#C9E3FF"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_153" x="0" y="-236.231" width="681.52" height="473.385" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_153"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+        <div class="top-ellipse top-ellipse-3">
+            <svg width="760" height="205" viewBox="0 0 760 205" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_152)">
+                    <ellipse cx="417.521" cy="-30.5458" rx="297.521" ry="114.803" fill="#BBF1FF"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_152" x="0" y="-265.349" width="835.043" height="469.606" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_152"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="logo">
+                <!-- <img src="images/logo.png" alt="听脑AI" width="32" height="32" style="width: 32px; height: 32px; object-fit: contain;" fetchpriority="high">
+                <span class="logo-text">听脑AI</span> -->
+                <img src="https://img.itingnao.com/assets/images/logoapp.png" alt="听脑AI"height="32" >
+            </div>
+            
+            <nav class="nav-desktop">
+                <div class="nav-item nav-dropdown">
+                    <div class="nav-dropdown-trigger">使用场景</div>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="nav-dropdown-menu">
+                        <a href="https://itingnao.com/official" class="nav-dropdown-item">办公</a>
+                        <a href="https://itingnao.com/education" class="nav-dropdown-item">教育</a>
+                        <a href="https://itingnao.com/education" class="nav-dropdown-item">销售</a>
+                        <a href="https://itingnao.com/media" class="nav-dropdown-item">自媒体</a>
+                    </div>
+                </div>
+                <!-- <a href="https://itingnao.com/activity" class="nav-item">定价</a> -->
+                <a href="https://itingnao.com/business" class="nav-item">企业服务介绍</a>
+                <a href="https://itingnao.com/openSDK.html" class="nav-item">API解决方案</a>
+                <a href="https://itingnao.com/tincard" target="_blank" class="nav-item">TinCard录音卡</a>
+            </nav>
+
+            <div class="header-right">
+                <a href="/home" class="btn btn-dark nav-btn">免费使用</a>
+                <button class="menu-toggle" aria-label="打开菜单">
+                    <span class="hamburger"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主体内容 -->
+        <main class="main-content">
+            <!-- Hero 主文案区 -->
+            <section class="hero">
+                <h1 class="hero-title">
+                    两小时录音 <span class="text-blue">3分钟</span> 总结 <span class="text-blue">10倍</span> 效率
+                </h1>
+                <p class="hero-subtitle">
+                    我是你的AI录音助手，通过实时录音转写、AI自动总结、AI随时可问，你的工作和学习<br class="desktop-only">时间最多可节省 90%！
+                </p>
+                <div class="hero-btn-wrapper">
+                    <div class="hero-btn-glow"></div>
+                    <a href="/home" class="hero-btn">免费使用</a>
+                </div>
+            </section>
+
+            <!-- 演示区（大图位） -->
+            <div class="showcase">
+                <div class="showcase-inner">
+                    <video src="videos/hero.mp4" autoplay loop muted playsinline preload="none" poster="./hero-poster.webp"></video>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 核心功能区 1 -->
+    <section class="feature-section">
+        <div class="feature-container">
+            <div class="feature-content">
+                <h3 class="feature-title">
+                    实时录音转写，<span class="highlight-wrapper">沟通即记录
+                        <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_feature1)" stroke-width="6" stroke-linecap="square"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_feature1" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#108BFE"/>
+                                    <stop offset="1" stop-color="#B1F2FF"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h3>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">
+                            <img src="icons/accuracy.svg" alt="准确率图标" loading="lazy">
+                        </div>
+                        <div class="feature-text">
+                            <strong>准确率最高达 98%：</strong>多人会议、专业词语也能稳稳识别
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <img src="icons/speaker-diarization.svg" alt="自动区分发言人图标" loading="lazy">
+                        </div>
+                        <div class="feature-text">
+                            <strong>自动区分发言人：</strong>智能声纹识别，让每段话可追溯
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <img src="icons/multilingual.svg" alt="多语言图标" loading="lazy">
+                        </div>
+                        <div class="feature-text">
+                            <strong>多语言翻译与16+方言：</strong>复杂沟通也能准确转写
+                        </div>
+                    </li>
+                </ul>
+                <a href="https://itingnao.com/home" class="btn btn-dark feature-btn">立即使用</a>
+            </div>
+            <div class="feature-media">
+                <div class="video-container">
+                    <!-- 使用用户提供的本地绝对路径视频 -->
+                    <video data-src="videos/transcribe.mp4" autoplay loop muted playsinline preload="none" poster="./feature1-poster.webp" class="lazy-video"></video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 2 - 智能总结 -->
+    <section class="summary-section">
+        <h3 class="summary-title">
+            AI 智能总结，2小时内容，<span class="highlight-wrapper">3分钟掌握
+                <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_summary)" stroke-width="6" stroke-linecap="square"/>
+                    <defs>
+                        <linearGradient id="paint0_linear_summary" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#108BFE" style="stop-color:#108BFE;stop-color:color(display-p3 0.0627 0.5450 0.9961);stop-opacity:1;"/>
+                            <stop offset="1" stop-color="#B1F2FF" style="stop-color:#B1F2FF;stop-color:color(display-p3 0.6941 0.9490 1.0000);stop-opacity:1;"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </span>
+        </h3>
+        
+        <div class="summary-tags">
+            <div class="summary-tag">
+                <span class="tag-icon">
+                    <img src="icons/table.svg" alt="自动生成表格图标" loading="lazy">
+                </span>
+                <strong>自动生成表格：</strong>关键信息结构化呈现
+            </div>
+            <div class="summary-tag">
+                <span class="tag-icon">
+                    <img src="icons/task-extract.svg" alt="待办任务自动提取图标" loading="lazy">
+                </span>
+                <strong>待办任务自动提取：</strong>关键行动一目了然
+            </div>
+            <div class="summary-tag">
+                <span class="tag-icon">
+                    <img src="icons/mindmap.svg" alt="自动生成思维导图图标" loading="lazy">
+                </span>
+                <strong>自动生成思维导图：</strong>思路清晰不再混乱
+            </div>
+        </div>
+
+        <div class="carousel-container">
+            <!-- 轮播图 1 -->
+            <picture><source srcset="images/table.webp" type="image/webp"><img src="images/table.png" alt="图一演示+(自动生成表格)" class="carousel-slide active" width="1200" height="700" loading="lazy"></picture>
+            <!-- 轮播图 2 -->
+            <picture><source srcset="images/mindmap.webp" type="image/webp"><img src="images/mindmap.png" alt="智能总结演示2" class="carousel-slide" width="1200" height="700" loading="lazy"></picture>
+            
+            <!-- 轮播锚点 -->
+            <div class="carousel-dots">
+                <div class="dot active" data-index="0"></div>
+                <div class="dot" data-index="1"></div>
+            </div>
+        </div>
+
+        <a href="https://itingnao.com/home" class="btn btn-dark summary-btn">立即使用</a>
+    </section>
+
+        <!-- 核心功能区 3 - 知识库问答 -->
+    <section class="feature-section reverse-layout">
+        <div class="feature-container">
+            <!-- 左侧图片/媒体区 -->
+            <div class="feature-media">
+                <div class="image-container">
+                    <picture><source srcset="images/ai-qa.webp" type="image/webp"><img src="images/ai-qa.png" alt="AI连接知识库演示" width="800" height="500" loading="lazy"></picture>
+                </div>
+            </div>
+
+            <!-- 右侧文案内容区 -->
+            <div class="feature-content">
+                <h3 class="feature-title">
+                    AI 连接你的知识库，让知识库成为<span class="highlight-wrapper">你的第二大脑
+                        <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_feature3)" stroke-width="6" stroke-linecap="square" class="stroke-draw"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_feature3" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#108BFE"/>
+                                    <stop offset="1" stop-color="#B1F2FF"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h3>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">
+                            <img src="icons/todo.svg" alt="待办事项图标" loading="lazy">
+                        </div>
+                        <div class="feature-text">
+                            总结一周待办事项，帮你回顾、判断并规划下一步
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <img src="icons/meeting-assets.svg" alt="会议资产图标" loading="lazy">
+                        </div>
+                        <div class="feature-text">
+                            把零散的会议信息，变成组织可用的数字资产
+                        </div>
+                    </li>
+                </ul>
+                <a href="https://itingnao.com/home" class="btn btn-dark feature-btn">立即使用</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 4 - 海量模板 -->
+    <section class="templates-section">
+        <div class="templates-header">
+            <h3 class="templates-title title-reveal is-visible">
+                <span class="templates-highlight-text">
+                    80+ 海量智能模板
+                    <svg class="highlight-stroke templates-highlight-stroke" width="100%" height="25" viewBox="0 0 180 25" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 20.5702C8.94373 19.2693 43.6002 13.7633 93.2954 6.32229C111.026 3.66743 113.743 3.48875 116.508 3.22762C119.273 2.96649 122.053 2.6794 121.456 3.91287C116.666 13.8152 97.8871 17.9557 95.0848 20.5421C94.1565 21.399 96.9925 21.6238 116.696 19.4397C136.399 17.2555 173.589 12.7307 194.466 10.2959C218.778 7.65361 227.337 7.23655 238.6 6.8643C244.845 6.6953 252.163 6.56671 268 6.43422" stroke="url(#paint0_linear_28032_266)" stroke-width="8" stroke-linecap="square"/>
+                        <defs>
+                            <linearGradient id="paint0_linear_28032_266" x1="0" y1="11.7951" x2="268" y2="12.4857" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#108BFE"/>
+                                <stop offset="1" stop-color="#B1F2FF"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>，<span class="highlight-wrapper">让每一次记录都更省时间</span>
+            </h3>
+            <p class="templates-subtitle">
+                覆盖办公、销售、教育等众多行业，智能推荐最合适你的模板，快速上手，无需纠结选择
+            </p>
+        </div>
+
+        <div class="templates-showcase">
+            <!-- 替换为您实际的海量模板大图路径 -->
+            <img src="./images/template-mockup.png" alt="海量模板示意图" class="templates-main-img" width="1200" height="700" loading="lazy">
+
+            <!-- 模版一 -->
+            <div class="template-float-card card-1">
+                <div class="card-header">
+                    <span class="icon">✨</span>
+                    <h3 class="title">极简总结</h3>
+                </div>
+                <p class="desc">将复杂的长内容极简化总结</p>
+                <div class="actions">
+                    <button class="btn-outline">预览</button>
+                    <button class="btn-primary">使用模板</button>
+                </div>
+            </div>
+
+            <!-- 模版二 -->
+            <div class="template-float-card card-2">
+                <div class="card-header">
+                    <span class="icon">💻</span>
+                    <h3 class="title">工作例会</h3>
+                </div>
+                <p class="desc">将复杂的长内容极简化总结</p>
+            </div>
+
+            <div class="template-float-card card-3">
+                <div class="card-header">
+                    <span class="icon">💬</span>
+                    <h3 class="title">讨论</h3>
+                </div>
+                <p class="desc">记录讨论要点形成共识</p>
+            </div>
+
+            <!-- 模版四 -->
+            <div class="template-float-card card-4">
+                <div class="card-header">
+                    <span class="icon">✍️</span>
+                    <h3 class="title">课堂笔记</h3>
+                </div>
+                <p class="desc">高效整理课堂知识点便于复习。</p>
+            </div>
+        </div>
+
+        <div class="templates-marquee-container">
+            <!-- 第一行：向右滚动（由 script 从 API 填充） -->
+            <div class="marquee-row marquee-right">
+                <div class="marquee-track" id="templates-track-right"></div>
+            </div>
+            <!-- 第二行：向左滚动（由 script 从 API 填充） -->
+            <div class="marquee-row marquee-left">
+                <div class="marquee-track" id="templates-track-left"></div>
+            </div>
+        </div>
+
+        <a href="https://itingnao.com/home" class="btn btn-dark templates-btn">立即使用</a>
+    </section>
+
+    <!-- 核心功能区 5 - 场景切换 -->
+    <section class="scenes-section">
+        <div class="scenes-top-wrapper">
+            <div class="scenes-header">
+                <h3 class="scenes-title">不管什么场景，记录都能自然跟上你的节奏</h3>
+                <p class="scenes-subtitle">无论是会议讨论、电话沟通还是日常交流，记录都会在沟通过程中自动完成，不打断对话，也不增加额外操作负担</p>
+            </div>
+
+            <div class="scenes-tabs-container">
+                <div class="scenes-tabs">
+                    <button class="scene-tab active" data-target="scene-meeting">会议记录</button>
+                    <button class="scene-tab" data-target="scene-study">学习辅助</button>
+                    <button class="scene-tab" data-target="scene-sales">销售通话</button>
+                    <button class="scene-tab" data-target="scene-content">内容创作</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenes-content-wrapper">
+            <!-- 场景 1：会议记录 -->
+            <div class="scene-card active" id="scene-meeting">
+                <div class="scene-card-left">
+                    <h2 class="scene-card-title">会议记录</h2>
+                    <p class="scene-card-desc">实时记录会议内容并自动转写，快速生成会议纪要、待办事项</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            实时转写
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            自动纪要
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            团队协作
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            知识管理
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <picture><source srcset="images/meeting-notes.webp" type="image/webp"><img src="images/meeting-notes.png" alt="会议记录" width="600" height="400" loading="lazy"></picture>
+                </div>
+            </div>
+            
+            <!-- 场景 2：学习辅助 -->
+            <div class="scene-card" id="scene-study">
+                <div class="scene-card-left">
+                    <h2 class="scene-card-title">学习辅助</h2>
+                    <p class="scene-card-desc">课堂与自学内容自动转写与总结，重点清晰，复习更高效</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            课堂转写
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            重点提炼
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            知识回顾
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            资料整理
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <picture><source srcset="images/study-assist.webp" type="image/webp"><img src="images/study-assist.png" alt="学习辅助" width="600" height="400" loading="lazy"></picture>
+                </div>
+            </div>
+
+            <!-- 场景 3：销售通话 -->
+            <div class="scene-card" id="scene-sales">
+                <div class="scene-card-left">
+                    <h2 class="scene-card-title">销售通话</h2>
+                    <p class="scene-card-desc">通话内容自动沉淀，关键信息可追溯，提升跟进效率</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            通话转写
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            客户要点
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            机会跟进
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            话术复盘
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <picture><source srcset="images/sales-call.webp" type="image/webp"><img src="images/sales-call.png" alt="销售通话" width="600" height="400" loading="lazy"></picture>
+                </div>
+            </div>
+
+            <!-- 场景 4：内容创作 -->
+            <div class="scene-card" id="scene-content">
+                <div class="scene-card-left">
+                    <h2 class="scene-card-title">内容创作</h2>
+                    <p class="scene-card-desc">灵感与素材自动整理，快速生成大纲，创作更顺畅</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            灵感记录
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            结构大纲
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            素材归档
+                        </div>
+                        <div class="scene-feature-item">
+                            <img src="icons/check.svg" alt="完成图标" loading="lazy">
+                            内容整理
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <picture><source srcset="images/content-creation.webp" type="image/webp"><img src="images/content-creation.png" alt="内容创作" width="600" height="400" loading="lazy"></picture>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 6 - 用户评价反馈 -->
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <h3 class="reviews-title">深受 40+ 万用户的喜爱</h3>
+            <p class="reviews-subtitle">学生、老师、销售、产品经理等用户都喜欢使用听脑AI</p>
+        </div>
+
+        <div class="reviews-marquee-container">
+            <!-- 第一行：向右滚动 -->
+            <div class="marquee-row marquee-right review-row">
+                <div class="marquee-track">
+                    <!-- 评论组 1 -->
+                    <div class="marquee-content review-content">
+                        <div class="review-card">
+                            <div class="review-title">极大地解放了双手</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"作为产品经理，每天有开不完的需求评审。以前做一次纪要要花半个多小时，现在完全扔给听脑AI，几分钟就能输出精准的待办表格，真的极大地解放了我的双手！"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-li.webp" type="image/webp"><img src="images/avatar-li.png" alt="李先生头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">李先生</div>
+                                    <div class="title">资深产品经理</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">复盘效率明显提升</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"我负责运营复盘，以前要把语音和聊天记录拼在一起看。现在听脑AI会直接生成时间线和关键结论，团队周会效率至少提升了一倍。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-he.webp" type="image/webp"><img src="images/avatar-he.png" alt="何女士头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">何女士</div>
+                                    <div class="title">电商运营负责人</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">客户沟通更省心</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"做咨询项目最怕遗漏细节。听脑AI把客户访谈自动整理成问题清单和行动建议，交付前检查轻松很多，客户满意度也更高了。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-sun.webp" type="image/webp"><img src="images/avatar-sun.png" alt="孙老师头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">孙老师</div>
+                                    <div class="title">咨询顾问</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- 评论组 2 (用于无缝衔接) -->
+                    <div class="marquee-content review-content">
+                        <div class="review-card">
+                            <div class="review-title">极大地解放了双手</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"作为产品经理，每天有开不完的需求评审。以前做一次纪要要花半个多小时，现在完全扔给听脑AI，几分钟就能输出精准的待办表格，真的极大地解放了我的双手！"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-li.webp" type="image/webp"><img src="images/avatar-li.png" alt="李先生头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">李先生</div>
+                                    <div class="title">资深产品经理</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">复盘效率明显提升</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"我负责运营复盘，以前要把语音和聊天记录拼在一起看。现在听脑AI会直接生成时间线和关键结论，团队周会效率至少提升了一倍。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-he.webp" type="image/webp"><img src="images/avatar-he.png" alt="何女士头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">何女士</div>
+                                    <div class="title">电商运营负责人</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">客户沟通更省心</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"做咨询项目最怕遗漏细节。听脑AI把客户访谈自动整理成问题清单和行动建议，交付前检查轻松很多，客户满意度也更高了。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-sun.webp" type="image/webp"><img src="images/avatar-sun.png" alt="孙老师头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">孙老师</div>
+                                    <div class="title">咨询顾问</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二行：向左滚动 -->
+            <div class="marquee-row marquee-left review-row">
+                <div class="marquee-track">
+                    <!-- 评论组 1 -->
+                    <div class="marquee-content review-content">
+                        <div class="review-card">
+                            <div class="review-title">跨国会议无压力</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"它的知识库连接功能太硬核了，现在我不止用它做记录，还会问它'我上周在二组会议上答应了什么事'，它一秒钟就能帮我翻出记录并总结好。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-zhou.webp" type="image/webp"><img src="images/avatar-zhou.png" alt="周总头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">周总</div>
+                                    <div class="title">科技公司创始人</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">销售复盘好帮手</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"律师每天要进行大量的客户访谈。听脑不仅保密合规，还能在复杂的方言口音下做到极高的识别率，这是我用过最省心的访谈记录工具。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-zhao.webp" type="image/webp"><img src="images/avatar-zhao.png" alt="赵律师头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">赵律师</div>
+                                    <div class="title">高级合伙人律师</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">采访整理省时省力</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"考研党的救星！教授语速太快根本记不下来，现在直接开着听脑AI上课，下课自动生成重点提纲和笔记，连考点它都帮我加粗了，感动哭！"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-liu.webp" type="image/webp"><img src="images/avatar-liu.png" alt="刘同学头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">刘同学</div>
+                                    <div class="title">在读研究生</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">多端同步太方便</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"HR 面试的时候真的很好用！以前我要一边记笔记一边思考下一个问题，容易冷场。现在我只管提问，面完就能拿到一份结构化的候选人优劣势分析报告。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-lin.webp" type="image/webp"><img src="images/avatar-lin.png" alt="林女士头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">林女士</div>
+                                    <div class="title">资深人力资源</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 评论组 2 (用于无缝衔接) -->
+                    <div class="marquee-content review-content">
+                        <div class="review-card">
+                            <div class="review-title">跨国会议无压力</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"它的知识库连接功能太硬核了，现在我不止用它做记录，还会问它'我上周在二组会议上答应了什么事'，它一秒钟就能帮我翻出记录并总结好。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-zhou.webp" type="image/webp"><img src="images/avatar-zhou.png" alt="周总头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">周总</div>
+                                    <div class="title">科技公司创始人</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">销售复盘好帮手</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"律师每天要进行大量的客户访谈。听脑不仅保密合规，还能在复杂的方言口音下做到极高的识别率，这是我用过最省心的访谈记录工具。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-zhao.webp" type="image/webp"><img src="images/avatar-zhao.png" alt="赵律师头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">赵律师</div>
+                                    <div class="title">高级合伙人律师</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">采访整理省时省力</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"考研党的救星！教授语速太快根本记不下来，现在直接开着听脑AI上课，下课自动生成重点提纲和笔记，连考点它都帮我加粗了，感动哭！"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-liu.webp" type="image/webp"><img src="images/avatar-liu.png" alt="刘同学头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">刘同学</div>
+                                    <div class="title">在读研究生</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-title">多端同步太方便</div>
+                            <div class="review-stars">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/></svg>
+                            </div>
+                            <div class="review-text">"HR 面试的时候真的很好用！以前我要一边记笔记一边思考下一个问题，容易冷场。现在我只管提问，面完就能拿到一份结构化的候选人优劣势分析报告。"</div>
+                            <div class="review-author">
+                                <div class="avatar"><picture><source srcset="images/avatar-lin.webp" type="image/webp"><img src="images/avatar-lin.png" alt="林女士头像" loading="lazy"></picture></div>
+                                <div class="author-info">
+                                    <div class="name">林女士</div>
+                                    <div class="title">资深人力资源</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 7 - 多端同步 -->
+    <section class="sync-section">
+        <div class="sync-container">
+            <!-- 左侧内容与下载区 -->
+            <div class="sync-content">
+                <div class="sync-text-wrapper">
+                    <h3 class="sync-title">支持多端使用，内容自动同步</h3>
+                    <p class="sync-subtitle">实现多端设备高效协同，数据实时同步，保障关键信息在整个工作流程中的连续与可追溯</p>
+                </div>
+                
+                <div class="download-grid">
+                    <!-- Pad -->
+                    <div class="download-card">
+                        <div class="qr-code">
+                            <picture><source srcset="images/pad.webp" type="image/webp"><img src="images/pad.png" alt="Pad QR" loading="lazy"></picture>
+                        </div>
+                        <div class="download-info">
+                            <span class="platform-name">Pad</span>
+                            <span class="action-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="4" x2="12" y2="16"></line>
+                                    <polyline points="7 11 12 16 17 11"></polyline>
+                                    <line x1="5" y1="20" x2="19" y2="20"></line>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- iOS -->
+                    <div class="download-card">
+                        <div class="qr-code">
+                            <picture><source srcset="images/IOS.webp" type="image/webp"><img src="images/IOS.png" alt="iOS QR" loading="lazy"></picture>
+                        </div>
+                        <div class="download-info">
+                            <span class="platform-name">iOS</span>
+                            <span class="action-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 7V4h3"></path><path d="M20 7V4h-3"></path><path d="M4 17v3h3"></path><path d="M20 17v3h-3"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- 小程序 -->
+                    <div class="download-card">
+                        <div class="qr-code">
+                            <picture><source srcset="images/miniprogram.webp" type="image/webp"><img src="images/miniprogram.png" alt="小程序 QR" loading="lazy"></picture>
+                        </div>
+                        <div class="download-info">
+                            <span class="platform-name">小程序</span>
+                            <span class="action-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 7V4h3"></path><path d="M20 7V4h-3"></path><path d="M4 17v3h3"></path><path d="M20 17v3h-3"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- 安卓 -->
+                    <div class="download-card">
+                        <div class="qr-code">
+                            <picture><source srcset="images/android.webp" type="image/webp"><img src="images/android.png" alt="安卓 QR" loading="lazy"></picture>
+                        </div>
+                        <div class="download-info">
+                            <span class="platform-name">安卓</span>
+                            <span class="action-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 7V4h3"></path><path d="M20 7V4h-3"></path><path d="M4 17v3h3"></path><path d="M20 17v3h-3"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧设备图展示区 -->
+            <div class="sync-media">
+                <picture><source srcset="images/multi-device.webp" type="image/webp"><img src="images/multi-device.png" alt="多端同步" class="sync-main-img" width="700" height="500" loading="lazy"></picture>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部召唤区 CTA -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <!-- 顶部悬浮的 Logo 图标 -->
+            <div class="cta-logo-wrapper">
+                <picture><source srcset="images/logo-3d.webp" type="image/webp"><img src="images/logo-3d.png" alt="听脑AI" class="cta-logo" width="120" height="120" loading="lazy"></picture>
+            </div>
+            
+            <div class="cta-text-group">
+                <h3 class="cta-title">立即使用听脑 AI</h3>
+                <p class="cta-subtitle">用自动化记录，替代重复整理，提高整体工作/学习效率</p>
+            </div>
+            <div class="hero-btn-wrapper">
+                <div class="hero-btn-glow"></div>
+                <a href="https://itingnao.com/home" class="hero-btn">免费使用</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- 上半部分：链接与二维码 -->
+            <div class="footer-top">
+                <!-- 链接网格 -->
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 class="footer-col-title">使用场景</h4>
+                        <ul class="footer-col-list">
+                            <li><a href="https://itingnao.com/official">办公</a></li>
+                            <li><a href="https://itingnao.com/education">教育</a></li>
+                            <li><a href="https://itingnao.com/sale">销售</a></li>
+                            <li><a href="https://itingnao.com/media">自媒体</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-col-title">产品</h4>
+                        <ul class="footer-col-list">
+                            <!-- {/* <li><a href="https://itingnao.com/activity">定价</a></li> */} -->
+                            <li><a href="https://itingnao.com/business">企业服务介绍</a></li>
+                            <li><a href="https://itingnao.com/openSDK.html">API解决方案</a></li>
+                            <li><a href="https://itingnao.com/tincard" target="_blank">TinCard录音卡</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-col-title">了解我们</h4>
+                        <ul class="footer-col-list">
+                            <li><a href="https://itingnao.com/about" target="_blank">关于我们</a></li>
+                            <li><a href="https://mhs9ny9s9r.feishu.cn/wiki/ZuMqwkGhhi56PhkZrIGcuuHonrf?from=from_copylink" target="_blank">帮助中心</a></li>
+                            <li><a href="javascript:void(0)">商务合作：W15223204512（微信号）</a></li>
+                            <li><a href="javascript:void(0)">联系电话：13883334418</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 二维码区域 -->
+                <div class="footer-qrs">
+                    <div class="qr-item">
+                        <div class="qr-img-wrapper">
+                            <picture><source srcset="images/customer-service.webp" type="image/webp"><img src="images/customer-service.png" alt="联系客服二维码" loading="lazy"></picture>
+                        </div>
+                        <span class="qr-label">联系客服</span>
+                    </div>
+                    <div class="qr-item">
+                        <div class="qr-img-wrapper">
+                            <picture><source srcset="images/wechat-official.webp" type="image/webp"><img src="images/wechat-official.png" alt="公众号二维码" loading="lazy"></picture>
+                        </div>
+                        <span class="qr-label">公众号</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <!-- 下半部分：版权与备案信息 -->
+            <div class="footer-bottom flex flex-col items-center">
+                <div class="footer-brand-info flex flex-col items-center gap-4">
+                    <div class="footer-logo flex items-center gap-2">
+                        <img src="images/logo.png" alt="听脑AI" width="24" height="24" style="width: 24px; height: 24px; object-fit: contain;" loading="lazy">
+                        <span class="footer-brand-name text-slate-300 font-medium">听脑AI | 你的语音助手</span>
+                    </div>
+                    <div class="footer-company-info text-sm text-slate-400 flex flex-wrap justify-center items-center gap-2">
+                        <span>上海秀御网络科技有限公司</span> <span class="separator text-slate-600">|</span> 
+                        <span>中国（上海）自由贸易试验区张江路665号三层</span> <span class="separator text-slate-600">|</span> 
+                        <a href="https://img.itingnao.com/assets/about/yingsi.html?s=1" target="_blank" class="hover:text-slate-300">隐私协议</a> <span class="separator text-slate-600">|</span> 
+                        <a href="https://img.itingnao.com/assets/about/user.html?s=1" target="_blank" class="hover:text-slate-300">用户协议</a>
+                    </div>
+                </div>
+                
+                <div class="footer-record-info flex flex-wrap justify-center items-center gap-4 mt-4 text-xs text-slate-400">
+                    <span>备案号：<a href="https://beian.miit.gov.cn/" target="_blank" class="record-link hover:text-slate-300">沪ICP备2023011076号-6</a></span>
+                    <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31011502402146" target="_blank" class="record-link flex items-center gap-1 hover:text-slate-300">
+                        <!-- 公安备案图标占位 -->
+                        <img src="images/shanghai-police.png" alt="公安徽标" class="record-icon w-4 h-4 object-contain" loading="lazy">
+                        沪公网安备31011502402146号
+                    </a>
+                    <a href="https://wap.scjgj.sh.gov.cn/businessCheck/verifKey.do?showType=extShow&serial=9031000020250818143833000015034018-SAIC_SHOW_310000-2c984b4c8e31c30a018f2a9241dd3677945&signData=MEYCIQD1gAIDL3CHipRIuQ9iLHyvDkgzWlKT0suxROWWrUR/qAIhAMdNERAG8UefC3yIO/Pn95ruvzrS3PaHBt6sQq6JupK2" target="_blank" class="record-link flex items-center gap-1 hover:text-slate-300">
+                        <!-- 工商图标占位 -->
+                        <img src="images/shanghai-ic.png" alt="工商徽标" class="record-icon h-5 w-auto object-contain" loading="lazy">
+                        上海工商
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 移动端抽屉菜单 -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-content">
+            <div class="mobile-nav-item mobile-nav-scenes">使用场景</div>
+            <a href="https://itingnao.com/official" class="mobile-nav-subitem">办公</a>
+            <a href="https://itingnao.com/education" class="mobile-nav-subitem">教育</a>
+            <a href="https://itingnao.com/education" class="mobile-nav-subitem">销售</a>
+            <a href="https://itingnao.com/media" class="mobile-nav-subitem">自媒体</a>
+            <!-- <a href="https://itingnao.com/activity" class="mobile-nav-item">定价</a> -->
+            <a href="https://itingnao.com/business" class="mobile-nav-item">企业服务介绍</a>
+            <a href="https://itingnao.com/openSDK.html" class="mobile-nav-item">API解决方案</a>
+            <a href="https://itingnao.com/tincard" target="_blank" class="mobile-nav-item">TinCard录音卡</a>
+            <a href="https://itingnao.com/home" class="btn btn-dark mobile-btn">免费使用</a>
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="back-to-top-btn" aria-label="返回顶部">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <script>
+        const backToTopBtn = document.getElementById('back-to-top');
+        if (backToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    backToTopBtn.classList.add('is-visible');
+                } else {
+                    backToTopBtn.classList.remove('is-visible');
+                }
+            });
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
+</body>
+</html>

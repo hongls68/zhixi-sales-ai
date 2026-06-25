@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智析 AI - 智能销售分析平台</title>
+    <link rel="dns-prefetch" href="//api.zixiai.com">
+    <link rel="preconnect" href="https://api.zixiai.com" crossorigin>
+    <style>
+      :root{--primary-blue:#1A8CFF;--primary-gradient:linear-gradient(180deg,#0F67FE 0%,#2AD1F8 100%);--text-dark:#242424;--text-muted:#666666;--bg-white:#FFFFFF;--btn-dark:#242424;--btn-dark-hover:#151515;--border-color:#E5E5E5;--bg-light:#F8F9FA}
+      *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+      html{font-size:16px;overflow-x:hidden}
+      body{font-family:"HarmonyOS Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background-color:#fff;color:var(--text-dark);overflow-x:hidden;line-height:1.6}
+      a{text-decoration:none;color:inherit}
+      ul{list-style:none}
+      .page-wrapper{position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:120px 0 72px;gap:80px;width:100%;margin:0 auto;min-height:100vh;background:#fff;overflow:hidden}
+      .top-ellipse{position:absolute;pointer-events:none;z-index:0;filter:blur(60px);max-width:100vw;overflow:hidden}
+      .top-ellipse svg{width:100%;height:100%;display:block}
+      .top-ellipse-1{width:484px;height:295px;left:0;top:-155px}
+      .top-ellipse-2{width:442px;height:233px;left:427px;top:-116px}
+      .top-ellipse-3{width:595px;height:230px;left:756px;top:-145px}
+      .header{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:1280px;padding:24px 40px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:9999;background:transparent;transition:all .3s ease}
+      .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+      .logo-icon{width:32px;height:32px;background:var(--primary-gradient);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:14px}
+      .logo-text{font-size:1.15rem;font-weight:700;letter-spacing:.5px;margin:0;padding:0;line-height:inherit}
+      .nav-desktop{display:flex;align-items:center;gap:40px;margin-left:20px}
+      .nav-item{font-size:.95rem;color:var(--text-dark);display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:500;position:relative}
+      .nav-item:hover{color:var(--primary-blue)}
+      .nav-dropdown{position:relative}
+      .nav-dropdown-trigger{cursor:pointer}
+      .nav-dropdown-menu{position:absolute;top:100%;left:0;background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.1);padding:12px 0;min-width:140px;display:none;z-index:100}
+      .nav-dropdown:hover .nav-dropdown-menu{display:block}
+      .nav-dropdown-item{display:block;padding:10px 20px;font-size:14px;color:var(--text-dark)}
+      .nav-dropdown-item:hover{background:var(--bg-light);color:var(--primary-blue)}
+      .btn{border:none;border-radius:8px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;position:relative;overflow:hidden;z-index:1;width:112px;height:40px;font-size:16px;transition:all .3s ease}
+      .btn-dark{background-color:var(--btn-dark);color:#fff}
+      .btn-dark:hover{background-color:var(--btn-dark-hover)}
+      .btn-outline{border:1px solid var(--border-color);background:#fff;color:var(--text-dark)}
+      .btn-outline:hover{border-color:var(--primary-blue);color:var(--primary-blue)}
+      .nav-btn{font-size:.95rem}
+      .hero-btn-wrapper{position:relative;display:inline-block;z-index:2;margin-top:54px}
+      .hero-btn{width:160px;height:54px;font-size:24px;border-radius:12px;background-color:var(--btn-dark);color:#fff;border:none;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:2;overflow:hidden;transition:all .3s ease}
+      .hero-btn:hover{transform:translateY(-2px)}
+      .hero-btn-glow{position:absolute;top:20%;left:5%;width:90%;height:100%;background:linear-gradient(90deg,#0f67fe 0%,#2ad1f8 25%,#667eea 50%,#4facfe 75%,#0f67fe 100%);background-size:200% auto;filter:blur(15px);opacity:.6;border-radius:inherit;z-index:1;animation:glow-move 3s linear infinite}
+      @keyframes glow-move{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+      .menu-toggle{display:none;background:none;border:none;cursor:pointer;width:32px;height:32px;position:relative;z-index:1000}
+      .hamburger,.hamburger::before,.hamburger::after{display:block;width:24px;height:2px;background-color:var(--text-dark);position:absolute;left:4px;transition:all .3s ease}
+      .hamburger{top:15px}
+      .hamburger::before{content:'';top:-7px}
+      .hamburger::after{content:'';top:7px}
+      .main-content{display:flex;flex-direction:column;align-items:center;width:100%;max-width:1280px;gap:60px;padding:0 40px;flex:1;margin:0 auto;box-sizing:border-box}
+      .hero{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:900px;z-index:2}
+      .hero-title{font-size:clamp(32px,5vw,54px);font-weight:700;line-height:1.3;letter-spacing:-.5px;color:var(--text-dark);margin-bottom:16px}
+      .hero-subtitle{font-size:clamp(14px,1.5vw,18px);color:var(--text-muted);line-height:1.6;margin-bottom:0}
+      .text-blue{background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+      .showcase{width:100%;max-width:1280px;aspect-ratio:16/9;border-radius:32px;background:linear-gradient(180deg,#E6F3FF 0%,#fff 100%);border:8px solid #fff;box-shadow:0 20px 60px rgba(0,50,150,.08),inset 0 0 0 1px rgba(26,140,255,.1);position:relative;overflow:hidden;will-change:transform}
+      .showcase-inner{width:100%;height:100%;overflow:hidden;border-radius:24px;display:flex;align-items:center;justify-content:center;background:#f0f4f8}
+      .showcase-placeholder{color:var(--text-muted);font-size:18px}
+      .feature-section{width:100%;max-width:1280px;padding:80px 40px}
+      .feature-container{display:flex;gap:60px;align-items:center}
+      .feature-content{flex:1}
+      .feature-media{flex:1}
+      .feature-title{font-size:32px;font-weight:700;color:var(--text-dark);margin-bottom:24px;line-height:1.3}
+      .feature-title .highlight-wrapper{position:relative;display:inline-block}
+      .highlight-stroke{position:absolute;bottom:-8px;left:0;overflow:visible}
+      .feature-list{margin-top:24px}
+      .feature-list li{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+      .feature-icon{width:48px;height:48px;border-radius:12px;background:var(--bg-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+      .feature-text{font-size:16px;color:var(--text-muted)}
+      .feature-text strong{color:var(--text-dark)}
+      .feature-btn{margin-top:32px}
+      .reverse-layout .feature-container{flex-direction:row-reverse}
+      .video-container,.image-container{width:100%;aspect-ratio:16/10;border-radius:24px;background:var(--bg-light);overflow:hidden;display:flex;align-items:center;justify-content:center}
+      .video-container video,.image-container img{width:100%;height:100%;object-fit:cover}
+      .video-placeholder,.image-placeholder{color:var(--text-muted);font-size:16px;text-align:center;padding:40px}
+      .summary-section{width:100%;max-width:1280px;padding:80px 40px;text-align:center}
+      .summary-title{font-size:32px;font-weight:700;color:var(--text-dark);margin-bottom:40px}
+      .summary-tags{display:flex;gap:20px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+      .summary-tag{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--bg-light);border-radius:12px;min-width:200px}
+      .tag-icon{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center}
+      .summary-tag strong{color:var(--text-dark)}
+      .carousel-container{position:relative;max-width:1000px;margin:0 auto 40px}
+      .carousel-slide{display:none;width:100%;border-radius:16px;background:var(--bg-light);aspect-ratio:16/10}
+      .carousel-slide.active{display:block}
+      .carousel-dots{display:flex;gap:12px;justify-content:center;margin-top:20px}
+      .dot{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;transition:all .3s ease}
+      .dot.active{background:var(--primary-blue);width:24px;border-radius:5px}
+      .summary-btn{margin-top:32px}
+      .templates-section{width:100%;max-width:1280px;padding:80px 40px;text-align:center}
+      .templates-header{margin-bottom:40px}
+      .templates-title{font-size:32px;font-weight:700;color:var(--text-dark);margin-bottom:16px}
+      .templates-subtitle{font-size:16px;color:var(--text-muted)}
+      .templates-showcase{position:relative;height:500px;margin:40px 0;display:flex;align-items:center;justify-content:center;background:var(--bg-light);border-radius:24px}
+      .template-placeholder{color:var(--text-muted);font-size:18px}
+      .template-float-card{position:absolute;background:#fff;border-radius:16px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);max-width:200px}
+      .template-float-card .card-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+      .template-float-card .icon{font-size:24px}
+      .template-float-card .title{font-size:14px;font-weight:600}
+      .template-float-card .desc{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+      .template-float-card .actions{display:flex;gap:8px}
+      .template-float-card .btn-outline,.template-float-card .btn-primary{flex:1;padding:8px;font-size:12px;border-radius:6px}
+      .template-float-card .btn-primary{background:var(--btn-dark);color:#fff;border:none}
+      .card-1{top:20%;left:10%}
+      .card-2{top:10%;right:15%}
+      .card-3{bottom:20%;left:15%}
+      .card-4{bottom:10%;right:10%}
+      .templates-marquee-container{overflow:hidden;margin:40px 0}
+      .marquee-row{display:flex;gap:20px}
+      .marquee-track{display:flex;gap:20px;animation:marquee-left 30s linear infinite}
+      .marquee-right .marquee-track{animation:marquee-right 30s linear infinite}
+      @keyframes marquee-left{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+      @keyframes marquee-right{0%{transform:translateX(-50%)}}
+      .templates-btn{margin-top:32px}
+      .scenes-section{width:100%;max-width:1280px;padding:80px 40px}
+      .scenes-header{text-align:center;margin-bottom:40px}
+      .scenes-title{font-size:32px;font-weight:700;color:var(--text-dark);margin-bottom:12px}
+      .scenes-subtitle{font-size:16px;color:var(--text-muted)}
+      .scenes-tabs-container{display:flex;justify-content:center}
+      .scenes-tabs{display:flex;gap:12px;background:var(--bg-light);padding:8px;border-radius:12px}
+      .scene-tab{padding:12px 24px;border:none;background:transparent;cursor:pointer;font-size:16px;color:var(--text-muted);border-radius:8px;transition:all .3s ease}
+      .scene-tab:hover{color:var(--text-dark)}
+      .scene-tab.active{background:#fff;color:var(--text-dark);box-shadow:0 2px 12px rgba(0,0,0,0.08)}
+      .scenes-content-wrapper{display:flex;justify-content:center}
+      .scene-card{display:none;background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,0.08);overflow:hidden;max-width:1000px}
+      .scene-card.active{display:flex}
+      .scene-card-left{flex:1;padding:40px}
+      .scene-card-right{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-light);min-height:300px}
+      .scene-card-title{font-size:24px;font-weight:700;margin-bottom:16px}
+      .scene-card-desc{color:var(--text-muted);margin-bottom:24px}
+      .scene-features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+      .scene-feature-item{display:flex;align-items:center;gap:8px;color:var(--text-muted)}
+      .reviews-section{width:100%;max-width:1280px;padding:80px 40px}
+      .reviews-header{text-align:center;margin-bottom:40px}
+      .reviews-title{font-size:32px;font-weight:700;color:var(--text-dark);margin-bottom:12px}
+      .reviews-subtitle{font-size:16px;color:var(--text-muted)}
+      .reviews-marquee-container{overflow:hidden}
+      .review-row{margin:20px 0}
+      .review-content{display:flex;gap:20px}
+      .review-card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.08);min-width:320px}
+      .review-title{font-size:16px;font-weight:600;margin-bottom:12px}
+      .review-stars{display:flex;gap:4px;margin-bottom:12px}
+      .review-stars svg{width:16px;height:16px}
+      .review-text{font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6}
+      .review-author{display:flex;align-items:center;gap:12px}
+      .avatar{width:40px;height:40px;border-radius:50%;background:var(--bg-light)}
+      .author-info{font-size:12px}
+      .name{font-weight:600;margin-bottom:2px}
+      .title{color:var(--text-muted)}
+      .sync-section{width:100%;max-width:1280px;padding:80px 40px}
+      .sync-container{display:flex;gap:60px;align-items:center;background:var(--bg-light);border-radius:24px;padding:60px}
+      .sync-content{flex:1}
+      .sync-media{flex:1;display:flex;align-items:center;justify-content:center;min-height:400px}
+      .sync-placeholder{color:var(--text-muted);font-size:18px}
+      .sync-text-wrapper{margin-bottom:40px}
+      .sync-title{font-size:28px;font-weight:700;margin-bottom:12px}
+      .sync-subtitle{font-size:16px;color:var(--text-muted)}
+      .download-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+      .download-card{background:#fff;border-radius:16px;padding:24px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+      .qr-code{width:80px;height:80px;background:var(--bg-light);border-radius:8px;display:flex;align-items:center;justify-content:center}
+      .download-info{display:flex;flex-direction:column;gap:4px}
+      .platform-name{font-size:16px;font-weight:600}
+      .action-icon{color:var(--primary-blue)}
+      .cta-section{width:100%;max-width:1280px;padding:80px 40px;text-align:center}
+      .cta-container{background:var(--bg-light);border-radius:24px;padding:60px;display:flex;flex-direction:column;align-items:center}
+      .cta-logo-wrapper{margin-bottom:24px}
+      .cta-text-group{margin-bottom:32px}
+      .cta-title{font-size:28px;font-weight:700;margin-bottom:12px}
+      .cta-subtitle{font-size:16px;color:var(--text-muted)}
+      .footer{width:100%;max-width:1280px;padding:60px 40px;border-top:1px solid var(--border-color)}
+      .footer-container{display:flex;flex-direction:column;gap:40px}
+      .footer-links{display:grid;grid-template-columns:repeat(4,1fr);gap:40px}
+      .footer-col-title{font-size:14px;font-weight:600;margin-bottom:16px}
+      .footer-col-list li{margin-bottom:12px}
+      .footer-col-list a{font-size:14px;color:var(--text-muted)}
+      .footer-col-list a:hover{color:var(--primary-blue)}
+      .footer-bottom{text-align:center;padding-top:40px;border-top:1px solid var(--border-color)}
+      .footer-bottom p{font-size:14px;color:var(--text-muted)}
+      .back-to-top-btn{position:fixed;right:24px;bottom:32px;width:48px;height:48px;border-radius:50%;background-color:#fff;color:var(--text-muted);border:1px solid #e2e8f0;box-shadow:0 4px 14px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:999;opacity:0;pointer-events:none;transform:translateY(16px);transition:all 0.3s ease}
+      .back-to-top-btn.is-visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+      .back-to-top-btn:hover{color:var(--primary-blue);box-shadow:0 6px 20px rgba(26,140,255,0.15)}
+      @media(max-width:768px){
+        .page-wrapper{padding:100px 0 40px;gap:40px}
+        .header{padding:16px 20px;max-width:100%;left:0;transform:none}
+        .nav-desktop{display:none}
+        .menu-toggle{display:flex;align-items:center;justify-content:center}
+        .main-content{padding:0 20px;gap:40px}
+        .hero-title{font-size:clamp(28px,7vw,40px)}
+        .showcase{border-radius:16px;border-width:4px}
+        .hero-btn{width:130px;height:46px;font-size:18px}
+        .hero-btn-wrapper{margin-top:32px}
+        .btn{width:100px;height:36px;font-size:14px}
+        .feature-section,.summary-section,.templates-section,.scenes-section,.reviews-section,.sync-section,.cta-section{padding:40px 20px}
+        .feature-container{flex-direction:column !important}
+        .feature-title,.summary-title,.templates-title,.scenes-title{font-size:24px}
+        .sync-container{padding:30px 20px}
+        .download-grid{grid-template-columns:1fr}
+        .cta-container{padding:40px 20px}
+        .cta-title{font-size:22px}
+        .footer{padding:40px 20px}
+        .footer-links{grid-template-columns:repeat(2,1fr)}
+        .scene-card{flex-direction:column}
+        .scene-card-right{min-height:200px}
+        .template-float-card{display:none}
+        .top-ellipse{display:none}
+      }
+      @media(max-width:480px){
+        .footer-links{grid-template-columns:1fr}
+        .scene-features-grid{grid-template-columns:1fr}
+        .summary-tags{flex-direction:column}
+        .summary-tag{width:100%}
+      }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="top-ellipse top-ellipse-1">
+            <svg width="649" height="260" viewBox="0 0 649 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_151)">
+                    <ellipse cx="286.223" cy="-7.33165" rx="242.223" ry="147.332" fill="url(#paint0_linear_28032_151)"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_151" x="-76" y="-274.663" width="724.445" height="534.663" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_151"/>
+                    </filter>
+                    <linearGradient id="paint0_linear_28032_151" x1="286.936" y1="35.1552" x2="285.821" y2="139.996" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#D9EAFF"/>
+                        <stop offset="0.412203" stop-color="#F0F8FF"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="top-ellipse top-ellipse-2">
+            <svg width="682" height="238" viewBox="0 0 682 238" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_153)">
+                    <ellipse cx="340.76" cy="0.461792" rx="220.76" ry="116.692" fill="#C9E3FF"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_153" x="0" y="-236.231" width="681.52" height="473.385" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_153"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+        <div class="top-ellipse top-ellipse-3">
+            <svg width="760" height="205" viewBox="0 0 760 205" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_28032_152)">
+                    <ellipse cx="417.521" cy="-30.5458" rx="297.521" ry="114.803" fill="#BBF1FF"/>
+                </g>
+                <defs>
+                    <filter id="filter0_f_28032_152" x="0" y="-265.349" width="835.043" height="469.606" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_28032_152"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="logo" onclick="window.location.href='/'">
+                <div class="logo-icon">智</div>
+                <span class="logo-text">智析 AI</span>
+            </div>
+            <nav class="nav-desktop">
+                <div class="nav-item nav-dropdown">
+                    <div class="nav-dropdown-trigger">使用场景</div>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="nav-dropdown-menu">
+                        <a href="#sales" class="nav-dropdown-item">销售通话</a>
+                        <a href="#meeting" class="nav-dropdown-item">会议记录</a>
+                        <a href="#review" class="nav-dropdown-item">销售复盘</a>
+                        <a href="#management" class="nav-dropdown-item">团队管理</a>
+                    </div>
+                </div>
+                <a href="#enterprise" class="nav-item">企业服务</a>
+                <a href="#api" class="nav-item">API 解决方案</a>
+            </nav>
+            <div class="header-right" style="display:flex;align-items:center;gap:16px">
+                <div id="auth-buttons">
+                    <a href="/login" class="btn btn-outline nav-btn">登录</a>
+                    <a href="/register" class="btn btn-dark nav-btn">注册</a>
+                </div>
+                <div id="user_info" style="display:none;align-items:center;gap:12px">
+                    <span id="header_username" style="font-size:14px"></span>
+                    <a href="/home" class="btn btn-dark nav-btn">用户中心</a>
+                    <button class="btn btn-outline" onclick="logout()" style="padding:8px 16px">退出</button>
+                </div>
+                <button class="menu-toggle" aria-label="打开菜单" onclick="toggleMobileMenu()">
+                    <span class="hamburger"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主体内容 -->
+        <main class="main-content">
+            <!-- Hero 主文案区 -->
+            <section class="hero">
+                <h1 class="hero-title">
+                    录音转写 <span class="text-blue">数据分析</span> 报告生成 <span class="text-blue">一站式</span> 解决
+                </h1>
+                <p class="hero-subtitle">
+                    智析 AI 是专为销售人员和企业管理者打造的智能分析平台<br>
+                    通过录音转写、深度数据分析、自动生成报告，让销售管理更高效
+                </p>
+                <div class="hero-btn-wrapper">
+                    <div class="hero-btn-glow"></div>
+                    <a href="/home" class="hero-btn">免费使用</a>
+                </div>
+            </section>
+
+            <!-- 演示区 -->
+            <div class="showcase">
+                <div class="showcase-inner">
+                    <div class="showcase-placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <p>平台演示视频/截图占位</p>
+                        <p style="font-size:14px;margin-top:8px">支持录音转写、数据分析、报告生成全流程展示</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 核心功能区 1：实时录音转写 -->
+    <section class="feature-section">
+        <div class="feature-container">
+            <div class="feature-content">
+                <h3 class="feature-title">
+                    实时录音转写，<span class="highlight-wrapper">沟通即记录
+                        <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_feature1)" stroke-width="6" stroke-linecap="square"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_feature1" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#108BFE"/>
+                                    <stop offset="1" stop-color="#B1F2FF"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h3>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>准确率最高达 98%：</strong>多人会议、专业术语也能稳稳识别
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>自动区分发言人：</strong>智能声纹识别，让每段话可追溯
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>多语言翻译与 16+ 方言：</strong>复杂沟通也能准确转写
+                        </div>
+                    </li>
+                </ul>
+                <a href="/home" class="btn btn-dark feature-btn">立即使用</a>
+            </div>
+            <div class="feature-media">
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom:12px">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        <p>录音转写演示</p>
+                        <p style="font-size:14px;margin-top:8px">支持实时转写、多人区分</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 2：智能总结 -->
+    <section class="summary-section">
+        <h3 class="summary-title">智能总结，<span class="text-blue">一键生成</span> 核心要点</h3>
+        <div class="summary-tags">
+            <div class="summary-tag">
+                <div class="tag-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <strong>关键信息提取</strong>
+            </div>
+            <div class="summary-tag">
+                <div class="tag-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <strong>节省 80% 整理时间</strong>
+            </div>
+            <div class="summary-tag">
+                <div class="tag-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <strong>待办事项自动识别</strong>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel-slide active"></div>
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
+        </div>
+        <a href="/home" class="btn btn-dark summary-btn">立即体验</a>
+    </section>
+
+    <!-- 核心功能区 3：数据分析 -->
+    <section class="feature-section reverse-layout">
+        <div class="feature-container">
+            <div class="feature-content">
+                <h3 class="feature-title">
+                    深度数据分析，<span class="highlight-wrapper">洞察销售机会
+                        <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_feature3)" stroke-width="6" stroke-linecap="square"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_feature3" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#108BFE"/>
+                                    <stop offset="1" stop-color="#B1F2FF"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h3>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>通话时长、频次分析：</strong>掌握销售节奏
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>转化率追踪：</strong>从线索到成交全流程监控
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>客户情绪分析：</strong>识别购买意向信号
+                        </div>
+                    </li>
+                </ul>
+                <a href="/home" class="btn btn-dark feature-btn">立即使用</a>
+            </div>
+            <div class="feature-media">
+                <div class="image-container">
+                    <div class="image-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom:12px">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <p>数据分析图表占位</p>
+                        <p style="font-size:14px;margin-top:8px">可视化报表、趋势分析</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能区 4：报告生成 -->
+    <section class="feature-section">
+        <div class="feature-container">
+            <div class="feature-content">
+                <h3 class="feature-title">
+                    自动生成专业<span class="highlight-wrapper">销售报告
+                        <svg class="highlight-stroke" width="150" height="18" viewBox="0 0 150 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.63748 12.938C6.62628 12.1706 26.0628 9.03958 53.9264 4.8356C63.8677 3.33568 65.3874 3.24936 66.9353 3.11163C68.4833 2.97391 70.0397 2.81999 69.6869 3.59023C66.8544 9.77381 56.304 12.1982 54.6981 13.7985C54.1662 14.3286 55.7459 14.4972 66.781 13.3124C77.8161 12.1276 98.6518 9.63809 110.346 8.30684C123.962 6.87803 128.746 6.69784 135.041 6.57181C138.53 6.52545 142.618 6.51483 146.829 6.50388" stroke="url(#paint0_linear_feature4)" stroke-width="6" stroke-linecap="square"/>
+                            <defs>
+                                <linearGradient id="paint0_linear_feature4" x1="3.79092" y1="7.41775" x2="146.694" y2="11.3898" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#108BFE"/>
+                                    <stop offset="1" stop-color="#B1F2FF"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h3>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>多种报告模板：</strong>日报/周报/月报一键生成
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>支持导出 PDF/Word：</strong>方便汇报分享
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="4 17 10 11 4 5"></polyline>
+                                <line x1="12" y1="19" x2="20" y2="19"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>定制化内容：</strong>按需调整报告结构
+                        </div>
+                    </li>
+                </ul>
+                <a href="/home" class="btn btn-dark feature-btn">立即使用</a>
+            </div>
+            <div class="feature-media">
+                <div class="image-container">
+                    <div class="image-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom:12px">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <p>报告模板占位</p>
+                        <p style="font-size:14px;margin-top:8px">专业格式、一键导出</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模板展示区 -->
+    <section class="templates-section">
+        <div class="templates-header">
+            <h3 class="templates-title">丰富模板，<span class="text-blue">满足多样需求</span></h3>
+            <p class="templates-subtitle">涵盖销售、会议、复盘等多种场景的专业模板</p>
+        </div>
+        <div class="templates-showcase">
+            <div class="template-placeholder">模板展示占位</div>
+            <div class="template-float-card card-1">
+                <div class="card-header">
+                    <span class="icon">📊</span>
+                    <span class="title">销售日报</span>
+                </div>
+                <div class="desc">每日销售数据汇总</div>
+                <div class="actions">
+                    <button class="btn-outline">预览</button>
+                    <button class="btn-primary">使用</button>
+                </div>
+            </div>
+            <div class="template-float-card card-2">
+                <div class="card-header">
+                    <span class="icon">📝</span>
+                    <span class="title">会议记录</span>
+                </div>
+                <div class="desc">自动整理会议要点</div>
+                <div class="actions">
+                    <button class="btn-outline">预览</button>
+                    <button class="btn-primary">使用</button>
+                </div>
+            </div>
+            <div class="template-float-card card-3">
+                <div class="card-header">
+                    <span class="icon">📈</span>
+                    <span class="title">周报分析</span>
+                </div>
+                <div class="desc">周度销售趋势分析</div>
+                <div class="actions">
+                    <button class="btn-outline">预览</button>
+                    <button class="btn-primary">使用</button>
+                </div>
+            </div>
+            <div class="template-float-card card-4">
+                <div class="card-header">
+                    <span class="icon">🎯</span>
+                    <span class="title">客户画像</span>
+                </div>
+                <div class="desc">客户特征深度分析</div>
+                <div class="actions">
+                    <button class="btn-outline">预览</button>
+                    <button class="btn-primary">使用</button>
+                </div>
+            </div>
+        </div>
+        <div class="templates-marquee-container">
+            <div class="marquee-row">
+                <div class="marquee-track">
+                    <span style="padding:8px 16px;background:#f0f4f8;border-radius:8px">销售话术分析</span>
+                    <span style="padding:8px 16px;background:#f0f4f8;border-radius:8px">客户跟进记录</span>
+                    <span style="padding:8px 16px;background:#f0f4f8;border-radius:8px">成交预测</span>
+                    <span style="padding:8px 16px;background:#f0f4f8;border-radius:8px">竞品分析</span>
+                    <span style="padding:8px 16px;background:#f0f4f8;border-radius:8px">团队绩效</span>
+                </div>
+            </div>
+        </div>
+        <a href="/home" class="btn btn-dark templates-btn">浏览所有模板</a>
+    </section>
+
+    <!-- 使用场景区 -->
+    <section class="scenes-section" id="sales">
+        <div class="scenes-header">
+            <h3 class="scenes-title">多场景适用</h3>
+            <p class="scenes-subtitle">覆盖销售全流程的智能分析工具</p>
+        </div>
+        <div class="scenes-tabs-container">
+            <div class="scenes-tabs">
+                <button class="scene-tab active" data-tab="sales">销售通话</button>
+                <button class="scene-tab" data-tab="meeting">会议记录</button>
+                <button class="scene-tab" data-tab="review">销售复盘</button>
+                <button class="scene-tab" data-tab="management">团队管理</button>
+            </div>
+        </div>
+        <div class="scenes-content-wrapper">
+            <div class="scene-card active" data-tab="sales">
+                <div class="scene-card-left">
+                    <h4 class="scene-card-title">销售通话分析</h4>
+                    <p class="scene-card-desc">自动分析销售与客户的通话内容，识别购买意向和潜在机会</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>自动识别客户痛点</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>话术优化建议</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>成交概率评估</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>跟进提醒设置</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <div class="image-placeholder">销售通话场景示意图</div>
+                </div>
+            </div>
+            <div class="scene-card" data-tab="meeting">
+                <div class="scene-card-left">
+                    <h4 class="scene-card-title">会议记录整理</h4>
+                    <p class="scene-card-desc">自动整理会议录音，生成结构化会议纪要和行动项</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>自动区分发言人</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>关键决策提取</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>行动项自动识别</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>一键分享纪要</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <div class="image-placeholder">会议记录场景示意图</div>
+                </div>
+            </div>
+            <div class="scene-card" data-tab="review">
+                <div class="scene-card-left">
+                    <h4 class="scene-card-title">销售复盘分析</h4>
+                    <p class="scene-card-desc">深度分析销售过程，找出成功经验和改进空间</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>成功案例拆解</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>失败原因分析</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>话术对比优化</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>团队经验分享</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <div class="image-placeholder">销售复盘场景示意图</div>
+                </div>
+            </div>
+            <div class="scene-card" data-tab="management">
+                <div class="scene-card-left">
+                    <h4 class="scene-card-title">团队绩效管理</h4>
+                    <p class="scene-card-desc">全面掌握团队销售表现，数据驱动管理决策</p>
+                    <div class="scene-features-grid">
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>团队数据看板</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>个人绩效排名</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>培训需求识别</span>
+                        </div>
+                        <div class="scene-feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A8CFF" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>目标达成预测</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-card-right">
+                    <div class="image-placeholder">团队管理场景示意图</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 用户评价区 -->
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <h3 class="reviews-title">用户评价</h3>
+            <p class="reviews-subtitle">听听来自销售团队和管理者的真实反馈</p>
+        </div>
+        <div class="reviews-marquee-container">
+            <div class="review-row">
+                <div class="review-content">
+                    <div class="review-card">
+                        <div class="review-title">销售经理</div>
+                        <div class="review-stars">
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <p class="review-text">"使用智析 AI 后，团队的销售效率提升了 40%。自动生成的报告让我们能更专注于客户沟通，而不是繁琐的文档工作。"</p>
+                        <div class="review-author">
+                            <div class="avatar"></div>
+                            <div class="author-info">
+                                <div class="name">张经理</div>
+                                <div class="title">某科技公司销售总监</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-title">一线销售</div>
+                        <div class="review-stars">
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <p class="review-text">"录音转写功能太棒了！以前每天要花 2 小时整理通话记录，现在只需要 10 分钟。AI 识别准确率很高，连专业术语都能准确转写。"</p>
+                        <div class="review-author">
+                            <div class="avatar"></div>
+                            <div class="author-info">
+                                <div class="name">李销售</div>
+                                <div class="title">某 SaaS 企业高级销售</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-title">创业老板</div>
+                        <div class="review-stars">
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg fill="#FFB800" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <p class="review-text">"作为创业公司，我们人手有限。智析 AI 帮助我们自动化处理大量销售数据，让团队能更专注于核心业务，ROI 非常高。"</p>
+                        <div class="review-author">
+                            <div class="avatar"></div>
+                            <div class="author-info">
+                                <div class="name">王总</div>
+                                <div class="title">某初创公司 CEO</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 同步下载区 -->
+    <section class="sync-section" id="enterprise">
+        <div class="sync-container">
+            <div class="sync-content">
+                <div class="sync-text-wrapper">
+                    <h3 class="sync-title">多端同步，随时随地访问</h3>
+                    <p class="sync-subtitle">支持 Web、移动端、桌面端，数据实时同步</p>
+                </div>
+                <div class="download-grid">
+                    <div class="download-card">
+                        <div class="qr-code">二维码</div>
+                        <div class="download-info">
+                            <span class="platform-name">iOS 应用</span>
+                            <span class="action-icon">📱</span>
+                        </div>
+                    </div>
+                    <div class="download-card">
+                        <div class="qr-code">二维码</div>
+                        <div class="download-info">
+                            <span class="platform-name">Android 应用</span>
+                            <span class="action-icon">📱</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sync-media">
+                <div class="sync-placeholder">多端同步示意图</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 行动号召区 -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <div class="cta-logo-wrapper">
+                <div class="logo-icon">智</div>
+            </div>
+            <div class="cta-text-group">
+                <h3 class="cta-title">立即开始免费使用</h3>
+                <p class="cta-subtitle">无需信用卡，即刻体验智能销售分析</p>
+            </div>
+            <a href="/home" class="btn btn-dark">免费注册</a>
+        </div>
+    </section>
+</main>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-links">
+            <div class="footer-col">
+                <h4 class="footer-col-title">产品</h4>
+                <ul class="footer-col-list">
+                    <li><a href="#features">功能特性</a></li>
+                    <li><a href="#templates">模板中心</a></li>
+                    <li><a href="#pricing">价格方案</a></li>
+                    <li><a href="#api">API 文档</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">解决方案</h4>
+                <ul class="footer-col-list">
+                    <li><a href="#sales">销售通话</a></li>
+                    <li><a href="#meeting">会议记录</a></li>
+                    <li><a href="#review">销售复盘</a></li>
+                    <li><a href="#management">团队管理</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">资源</h4>
+                <ul class="footer-col-list">
+                    <li><a href="#blog">官方博客</a></li>
+                    <li><a href="#help">帮助中心</a></li>
+                    <li><a href="#community">社区</a></li>
+                    <li><a href="#case">成功案例</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">关于</h4>
+                <ul class="footer-col-list">
+                    <li><a href="#about">公司简介</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                    <li><a href="#privacy">隐私政策</a></li>
+                    <li><a href="#terms">服务条款</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 智析 AI. 保留所有权利。</p>
+        </div>
+    </div>
+</footer>
+
+<!-- 返回顶部按钮 -->
+<button class="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="返回顶部">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+</button>
+
+<script>
+// 移动端菜单切换
+function toggleMobileMenu() {
+    const header = document.querySelector('.header');
+    header.classList.toggle('is-open');
+}
+
+// 返回顶部按钮显示/隐藏
+window.addEventListener('scroll', () => {
+    const btn = document.querySelector('.back-to-top-btn');
+    if (window.scrollY > 300) {
+        btn.classList.add('is-visible');
+    } else {
+        btn.classList.remove('is-visible');
+    }
+});
+
+// 场景 Tab 切换
+document.querySelectorAll('.scene-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        
+        // 更新 Tab 激活状态
+        document.querySelectorAll('.scene-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // 更新场景卡片
+        document.querySelectorAll('.scene-card').forEach(card => {
+            card.classList.remove('active');
+            if (card.dataset.tab === tabName) {
+                card.classList.add('active');
+            }
+        });
+    });
+});
+
+// 轮播图自动切换
+let currentSlide = 0;
+const slides = document.querySelectorAll('.carousel-slide');
+const dots = document.querySelectorAll('.dot');
+
+if (slides.length > 0) {
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }, 4000);
+}
+
+// 检查登录状态
+function checkLoginStatus() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+    
+    if (token && user) {
+        // 已登录
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('user_info').style.display = 'flex';
+        const userData = JSON.parse(user);
+        document.getElementById('header_username').textContent = userData.username || userData.name;
+    } else {
+        // 未登录
+        document.getElementById('auth-buttons').style.display = 'flex';
+        document.getElementById('user_info').style.display = 'none';
+    }
+}
+
+// 退出登录
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    document.getElementById('auth-buttons').style.display = 'flex';
+    document.getElementById('user_info').style.display = 'none';
+    alert('已退出登录');
+}
+
+// 页面加载时检查登录状态
+document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+// 平滑滚动
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

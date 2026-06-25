@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智析 AI - 登录/注册</title>
+    <style>
+        :root{--primary-blue:#1A8CFF;--primary-gradient:linear-gradient(180deg,#0F67FE 0%,#2AD1F8 100%);--text-dark:#242424;--text-muted:#666666;--bg-white:#FFFFFF;--btn-dark:#242424;--btn-dark-hover:#151515;--border-color:#E5E5E5;--bg-light:#F8F9FA;--success:#52C41A;--error:#FF4D4F}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+        body{font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center}
+        .auth-container{width:100%;max-width:420px;padding:20px}
+        .auth-card{background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1);overflow:hidden}
+        .auth-header{background:var(--primary-gradient);padding:32px;text-align:center;color:#fff}
+        .auth-header .logo{width:48px;height:48px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;font-weight:bold;color:var(--primary-blue)}
+        .auth-header h1{font-size:24px;margin-bottom:8px}
+        .auth-header p{font-size:14px;opacity:0.9}
+        .auth-tabs{display:flex;border-bottom:1px solid var(--border-color)}
+        .auth-tab{flex:1;padding:16px;text-align:center;cursor:pointer;border:none;background:#fff;color:var(--text-muted);font-size:14px;transition:all 0.3s}
+        .auth-tab:hover{color:var(--text-dark)}
+        .auth-tab.active{border-bottom:2px solid var(--primary-blue);color:var(--primary-blue);font-weight:600}
+        .auth-body{padding:32px}
+        .auth-form{display:none}
+        .auth-form.active{display:block}
+        .form-group{margin-bottom:20px}
+        .form-label{display:block;margin-bottom:8px;font-size:14px;font-weight:500;color:var(--text-dark)}
+        .form-input{width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;transition:border-color 0.3s}
+        .form-input:focus{outline:none;border-color:var(--primary-blue)}
+        .form-hint{font-size:12px;color:var(--text-muted);margin-top:4px}
+        .form-error{color:var(--error);font-size:12px;margin-top:4px;display:none}
+        .form-error.show{display:block}
+        .btn{padding:12px 20px;border-radius:8px;border:none;cursor:pointer;font-size:14px;transition:all 0.3s;font-weight:500}
+        .btn-block{width:100%}
+        .btn-primary{background:var(--primary-blue);color:#fff}
+        .btn-primary:hover{background:#0d6efd}
+        .btn-primary:disabled{background:#ccc;cursor:not-allowed}
+        .auth-divider{display:flex;align-items:center;margin:24px 0}
+        .auth-divider::before,.auth-divider::after{content:'';flex:1;border-top:1px solid var(--border-color)}
+        .auth-divider span{padding:0 16px;color:var(--text-muted);font-size:12px}
+        .back-to-home{display:flex;align-items:center;gap:8px;color:var(--text-muted);text-decoration:none;font-size:14px;margin-bottom:20px}
+        .back-to-home:hover{color:var(--primary-blue)}
+        .checkbox-group{display:flex;align-items:center;gap:8px}
+        .checkbox-group input{width:16px;height:16px}
+        .checkbox-group label{font-size:14px;color:var(--text-muted)}
+        .forgot-password{color:var(--primary-blue);text-decoration:none;font-size:14px}
+        .forgot-password:hover{text-decoration:underline}
+        .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-radius:50%;border-top-color:transparent;animation:spin 0.8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="/" class="back-to-home">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            返回首页
+        </a>
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">智</div>
+                <h1>智析 AI</h1>
+                <p>智能销售分析平台</p>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">登录</div>
+                <a href="/register" class="auth-tab" style="text-decoration:none;color:inherit">注册</a>
+            </div>
+            <div class="auth-body">
+                <!-- 登录表单 -->
+                <form class="auth-form active" id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">用户名/邮箱</label>
+                        <input type="text" class="form-input" id="loginUsername" placeholder="请输入用户名或邮箱" required>
+                        <p class="form-error" id="loginError">登录失败，请检查用户名和密码</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="请输入密码" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">记住我</label>
+                            <a href="#" class="forgot-password" onclick="showForgotPassword()">忘记密码？</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="loginBtn">登录</button>
+                </form>
+
+                <!-- 注册表单 -->
+                <form class="auth-form" id="register-form" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">用户名</label>
+                        <input type="text" class="form-input" id="registerUsername" placeholder="请输入用户名" required>
+                        <p class="form-hint">3-20 个字符，支持字母、数字、下划线</p>
+                        <p class="form-error" id="registerUsernameError">用户名格式不正确</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-input" id="registerEmail" placeholder="请输入邮箱" required>
+                        <p class="form-error" id="registerEmailError">邮箱格式不正确</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码</label>
+                        <input type="password" class="form-input" id="registerPassword" placeholder="请输入密码" required>
+                        <p class="form-hint">最少 8 个字符，包含字母和数字</p>
+                        <p class="form-error" id="registerPasswordError">密码格式不正确</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">确认密码</label>
+                        <input type="password" class="form-input" id="registerConfirmPassword" placeholder="请再次输入密码" required>
+                        <p class="form-error" id="registerConfirmError">两次密码输入不一致</p>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <label for="agreeTerms">我已阅读并同意 <a href="#" style="color:var(--primary-blue)">服务条款</a> 和 <a href="#" style="color:var(--primary-blue)">隐私政策</a></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="registerBtn">注册</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签切换
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // 切换标签样式
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 切换表单
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                document.getElementById(tabName + '-form').classList.add('active');
+                
+                // 清除错误信息
+                document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+            });
+        });
+
+        // 登录处理
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+            
+            // 显示加载状态
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span> 登录中...';
+            loginError.classList.remove('show');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 保存 token
+                    if (rememberMe) {
+                        localStorage.setItem('token', result.token);
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                    } else {
+                        sessionStorage.setItem('token', result.token);
+                        sessionStorage.setItem('user', JSON.stringify(result.user));
+                    }
+                    
+                    // 跳转到首页或用户中心
+                    window.location.href = '/home';
+                } else {
+                    loginError.textContent = result.message || '登录失败，请检查用户名和密码';
+                    loginError.classList.add('show');
+                }
+            } catch (error) {
+                loginError.textContent = '网络错误，请稍后重试';
+                loginError.classList.add('show');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        }
+
+        // 注册处理
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            const registerBtn = document.getElementById('registerBtn');
+            
+            // 验证
+            let hasError = false;
+            
+            // 用户名验证
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                document.getElementById('registerUsernameError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('registerUsernameError').classList.remove('show');
+            }
+            
+            // 邮箱验证
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('registerEmailError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('registerEmailError').classList.remove('show');
+            }
+            
+            // 密码验证
+            if (!/^(?=.*[a-zA-Z])(?=.*\d).{8,}$/.test(password)) {
+                document.getElementById('registerPasswordError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('registerPasswordError').classList.remove('show');
+            }
+            
+            // 确认密码验证
+            if (password !== confirmPassword) {
+                document.getElementById('registerConfirmError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('registerConfirmError').classList.remove('show');
+            }
+            
+            // 条款验证
+            if (!agreeTerms) {
+                alert('请先同意服务条款和隐私政策');
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // 显示加载状态
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="loading"></span> 注册中...';
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('注册成功！请登录');
+                    // 切换到登录表单
+                    document.querySelector('[data-tab="login"]').click();
+                } else {
+                    alert(result.message || '注册失败，请稍后重试');
+                }
+            } catch (error) {
+                alert('网络错误，请稍后重试');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = '注册';
+            }
+        }
+
+        // 忘记密码
+        function showForgotPassword() {
+            const email = prompt('请输入您的邮箱地址，我们将发送重置密码链接：');
+            if (email) {
+                // TODO: 实现忘记密码功能
+                alert('重置密码链接已发送到您的邮箱');
+            }
+        }
+    </script>
+</body>
+</html>
