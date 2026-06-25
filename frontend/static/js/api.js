@@ -5,7 +5,7 @@
 (function() {
   // 配置：API地址
   var API_BASE = 'http://localhost:8000/api';
-  var USE_API = false; // 设为 true 使用后端API，false 使用 Mock
+  var USE_API = true; // 设为 true 使用后端API，false 使用 Mock
 
   // 获取Token
   function getToken() {
@@ -110,32 +110,45 @@
       });
     },
 
-    login: function(phone, code) {
+    login: function(account, password) {
       if (USE_API) {
         return request('/auth/login', {
           method: 'POST',
-          body: JSON.stringify({ phone: phone, code: code })
+          body: JSON.stringify({ account: account, password: password })
         });
       }
+      // Mock模式
       return new Promise(function(resolve, reject) {
         setTimeout(function() {
-          if (code === '123456') {
+          if (password.length >= 6) {
             resolve({
               token: 'mock_token_' + Date.now(),
-              user: { id: 1, phone: phone, nickname: '用户' + phone.slice(-4) }
+              user: {
+                id: 1,
+                phone: account,
+                username: account,
+                nickname: account === 'admin' ? '管理员' : '用户' + account.slice(-4),
+                role: account === 'admin' ? 'admin' : 'user'
+              }
             });
           } else {
-            reject({ message: '验证码错误' });
+            reject({ message: '密码错误' });
           }
         }, 800);
       });
     },
 
-    register: function(phone, code, password) {
+    register: function(phone, code, password, username, email) {
       if (USE_API) {
         return request('/auth/register', {
           method: 'POST',
-          body: JSON.stringify({ phone: phone, code: code, password: password })
+          body: JSON.stringify({
+            phone: phone,
+            code: code,
+            password: password,
+            username: username || null,
+            email: email || null
+          })
         });
       }
       return new Promise(function(resolve, reject) {
@@ -143,7 +156,13 @@
           if (code === '123456' && password.length >= 6) {
             resolve({
               token: 'mock_token_' + Date.now(),
-              user: { id: 1, phone: phone, nickname: '用户' + phone.slice(-4) }
+              user: {
+                id: 1,
+                phone: phone,
+                username: username,
+                email: email,
+                nickname: '用户' + phone.slice(-4)
+              }
             });
           } else {
             reject({ message: '验证码错误或密码太短' });
@@ -260,6 +279,123 @@
         return request('/team/members');
       }
       return mockData.getTeamMembers();
+    },
+
+    // 管理员接口
+    getAdminStats: function() {
+      if (USE_API) {
+        return request('/admin/stats');
+      }
+      // Mock数据
+      return new Promise(function(resolve) {
+        resolve({
+          dau: 12,
+          wau: 45,
+          total_users: 156,
+          today_users: 5,
+          total_analyses: 423,
+          today_analyses: 18,
+          user_trend: [
+            { date: '06-18', count: 3 }, { date: '06-19', count: 5 },
+            { date: '06-20', count: 2 }, { date: '06-21', count: 4 },
+            { date: '06-22', count: 6 }, { date: '06-23', count: 3 },
+            { date: '06-24', count: 5 }
+          ],
+          analysis_trend: [
+            { date: '06-18', count: 8 }, { date: '06-19', count: 12 },
+            { date: '06-20', count: 6 }, { date: '06-21', count: 15 },
+            { date: '06-22', count: 20 }, { date: '06-23', count: 10 },
+            { date: '06-24', count: 18 }
+          ]
+        });
+      });
+    },
+
+    getAdminUsers: function(page, keyword) {
+      if (USE_API) {
+        var query = new URLSearchParams({ page: page, keyword: keyword || '' }).toString();
+        return request('/admin/users?' + query);
+      }
+      return new Promise(function(resolve) {
+        resolve({
+          list: [
+            { id: 1, phone: 'admin', nickname: '管理员', role: 'admin', is_active: true, created_at: '2026-06-20T10:00:00' },
+            { id: 2, phone: '13800138000', nickname: '用户8000', role: 'user', is_active: true, created_at: '2026-06-21T14:00:00' },
+            { id: 3, phone: '13900139000', nickname: '用户9000', role: 'user', is_active: true, created_at: '2026-06-22T09:00:00' }
+          ],
+          total: 3,
+          page: 1,
+          page_size: 20
+        });
+      });
+    },
+
+    updateAdminUser: function(userId, data) {
+      if (USE_API) {
+        return request('/admin/users/' + userId, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+      }
+      return new Promise(function(resolve) { resolve({ id: userId, ...data }); });
+    },
+
+    toggleAdminUserActive: function(userId) {
+      if (USE_API) {
+        return request('/admin/users/' + userId + '/toggle-active', { method: 'PUT' });
+      }
+      return new Promise(function(resolve) { resolve({ id: userId, is_active: true }); });
+    },
+
+    deleteAdminUser: function(userId) {
+      if (USE_API) {
+        return request('/admin/users/' + userId, { method: 'DELETE' });
+      }
+      return new Promise(function(resolve) { resolve({ message: '删除成功' }); });
+    },
+
+    getAdminAnalyses: function(page, keyword) {
+      if (USE_API) {
+        var query = new URLSearchParams({ page: page, keyword: keyword || '' }).toString();
+        return request('/admin/analyses?' + query);
+      }
+      return new Promise(function(resolve) {
+        resolve({
+          list: [
+            { id: 1, title: '客户A沟通记录', user_phone: '13800138000', analysis: { intent_score: 78 }, created_at: '2026-06-24T10:30:00' },
+            { id: 2, title: '团队周会纪要', user_phone: '13900139000', analysis: { intent_score: 92 }, created_at: '2026-06-23T14:00:00' }
+          ],
+          total: 2,
+          page: 1,
+          page_size: 20
+        });
+      });
+    },
+
+    deleteAdminAnalysis: function(analysisId) {
+      if (USE_API) {
+        return request('/admin/analyses/' + analysisId, { method: 'DELETE' });
+      }
+      return new Promise(function(resolve) { resolve({ message: '删除成功' }); });
+    },
+
+    getOperationLogs: function(page, action) {
+      if (USE_API) {
+        var query = new URLSearchParams({ page: page, action: action || '' }).toString();
+        return request('/admin/operation-logs?' + query);
+      }
+      return new Promise(function(resolve) {
+        resolve({
+          list: [
+            { id: 1, admin_name: '管理员', action: 'delete_user', target_type: 'user', target_id: 5, detail: '删除用户 13800138000', ip_address: '127.0.0.1', created_at: '2026-06-25T10:00:00' },
+            { id: 2, admin_name: '管理员', action: 'update_user', target_type: 'user', target_id: 3, detail: '更新用户 13900139000: 角色: user → admin', ip_address: '127.0.0.1', created_at: '2026-06-25T09:30:00' },
+            { id: 3, admin_name: '管理员', action: 'disable_user', target_type: 'user', target_id: 7, detail: '禁用用户 15000150000', ip_address: '127.0.0.1', created_at: '2026-06-24T16:00:00' }
+          ],
+          total: 3,
+          page: 1,
+          page_size: 20
+        });
+      });
     }
   };
 })();

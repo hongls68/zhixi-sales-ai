@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db
 from config import BACKEND_PORT, DEBUG, FRONTEND_URL
-from routes import auth_router, analysis_router, user_router
+from routes import auth_router, analysis_router, user_router, admin_router
 
 # ============ App 初始化 ============
 app = FastAPI(
@@ -54,6 +54,7 @@ async def startup():
 app.include_router(auth_router)
 app.include_router(analysis_router)
 app.include_router(user_router)
+app.include_router(admin_router)
 
 
 # ============ 健康检查 ============

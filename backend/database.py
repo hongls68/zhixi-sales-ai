@@ -32,7 +32,33 @@ def get_db():
 
 
 def init_db():
-    """初始化数据库表"""
-    from models.user import User
+    """初始化数据库表和默认数据"""
+    from models.user import User, OperationLog
     from models.analysis import Analysis
+
+    # 创建表
     Base.metadata.create_all(bind=engine)
+    print("[OK] 数据库表创建完成")
+
+    # 创建默认管理员
+    db = SessionLocal()
+    try:
+        admin = db.query(User).filter(User.phone == "admin").first()
+        if not admin:
+            from services.auth_service import hash_password
+            admin = User(
+                phone="admin",
+                nickname="管理员",
+                password_hash=hash_password("admin123"),
+                role="admin",
+                is_active=True
+            )
+            db.add(admin)
+            db.commit()
+            print("[OK] 默认管理员创建成功：admin / admin123")
+        else:
+            print("[OK] 管理员账号已存在")
+    except Exception as e:
+        print(f"[WARN] 创建管理员失败: {e}")
+    finally:
+        db.close()

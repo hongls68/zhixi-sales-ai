@@ -1,14 +1,14 @@
 """
 智析销售AI - AI服务
-支持 Ollama（本地）和 DeepSeek（云端）两种模式
+支持兼容OpenAI的API和本地Ollama
 """
 import json
 import re
 import httpx
 from config import (
     AI_PROVIDER,
-    OLLAMA_BASE_URL, OLLAMA_MODEL,
-    DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
+    API_BASE_URL, API_KEY, API_MODEL,
+    OLLAMA_BASE_URL, OLLAMA_MODEL
 )
 from prompts.sales import build_prompt
 
@@ -28,14 +28,51 @@ async def analyze_with_ai(content: str, user_context: dict = None) -> dict:
     prompt = build_prompt(content, user_context)
 
     # 根据配置选择AI提供商
-    if AI_PROVIDER == "ollama":
+    if AI_PROVIDER == "api":
+        result = await call_api(prompt)
+    elif AI_PROVIDER == "ollama":
         result = await call_ollama(prompt)
-    elif AI_PROVIDER == "deepseek":
-        result = await call_deepseek(prompt)
     else:
         raise ValueError(f"Unknown AI provider: {AI_PROVIDER}")
 
     return result
+
+
+async def call_api(prompt: str) -> dict:
+    """调用兼容OpenAI的API"""
+    if not API_KEY:
+        print("API Key未配置，使用Mock数据")
+        return get_mock_response()
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"{API_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": API_MODEL,
+                    "messages": [
+                        {"role": "system", "content": "你是一位资深的销售分析专家，请严格按照JSON格式输出分析结果。"},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 2000
+                }
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # 提取AI回复
+            ai_response = data["choices"][0]["message"]["content"]
+            print(f"AI原始响应: {ai_response[:200]}...")
+
+            return parse_ai_response(ai_response)
+    except Exception as e:
+        print(f"API调用失败: {e}")
+        return get_mock_response()
 
 
 async def call_ollama(prompt: str) -> dict:
@@ -53,43 +90,9 @@ async def call_ollama(prompt: str) -> dict:
             response.raise_for_status()
             data = response.json()
 
-            # 解析AI返回的JSON
             return parse_ai_response(data.get("response", ""))
     except Exception as e:
         print(f"Ollama调用失败: {e}")
-        return get_mock_response()
-
-
-async def call_deepseek(prompt: str) -> dict:
-    """调用DeepSeek API"""
-    if not DEEPSEEK_API_KEY:
-        print("DeepSeek API Key未配置，使用Mock数据")
-        return get_mock_response()
-
-    try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(
-                f"{DEEPSEEK_BASE_URL}/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": DEEPSEEK_MODEL,
-                    "messages": [
-                        {"role": "system", "content": "你是一位销售分析专家，请严格按照JSON格式输出。"},
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.7,
-                    "max_tokens": 2000
-                }
-            )
-            response.raise_for_status()
-            data = response.json()
-
-            return parse_ai_response(data["choices"][0]["message"]["content"])
-    except Exception as e:
-        print(f"DeepSeek调用失败: {e}")
         return get_mock_response()
 
 
@@ -110,9 +113,10 @@ def parse_ai_response(text: str) -> dict:
                 "keywords": result.get("keywords", [])
             }
         except json.JSONDecodeError:
-            pass
+            print(f"JSON解析失败: {json_match.group()}")
 
-    # 解析失败，返回默认
+    # 解析失败，尝试从文本中提取关键信息
+    print(f"AI响应解析失败，返回默认值: {text[:100]}...")
     return get_mock_response()
 
 

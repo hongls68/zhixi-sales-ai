@@ -29,9 +29,6 @@
       .section-title{font-size:var(--text-base);font-weight:600;color:var(--text-primary)}
       .section-body{padding:20px}
       .content-box{background:var(--gray-50);border-radius:var(--radius-md);padding:20px;font-size:var(--text-sm);line-height:1.8;color:var(--text-primary);white-space:pre-wrap;max-height:400px;overflow-y:auto}
-      .score-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
-      .score-value{font-size:var(--text-4xl);font-weight:800;color:var(--text-white)}
-      .score-label{font-size:var(--text-xs);color:rgba(255,255,255,0.8)}
       .insight-list{display:flex;flex-direction:column;gap:12px}
       .insight-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--gray-50);border-radius:var(--radius-md)}
       .insight-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
@@ -58,7 +55,7 @@
                 <a class="nav-item" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>分析记录</a>
                 <a class="nav-item" href="team.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>团队协作</a>
                 <div class="nav-section-title">其他</div>
-                <a class="nav-item" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4"></path></svg>设置</a>
+                <a class="nav-item" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>设置</a>
             </nav>
         </aside>
 
@@ -85,11 +82,14 @@
     <script>
         if(!window.auth.isLoggedIn()){window.location.href='login.html';}
 
+        var currentAnalysisId = null;
+
         function loadAnalysis() {
             var params = new URLSearchParams(window.location.search);
             var id = params.get('id') || '1';
+            currentAnalysisId = id;
 
-            window.api.mockGetAnalysisDetail(id).then(function(data) {
+            window.api.getAnalysisDetail(id).then(function(data) {
                 var scoreColorHex = window.utils.getScoreColorHex(data.analysis.intent_score);
                 var sentimentWidth = data.analysis.sentiment === 'positive' ? 70 : (data.analysis.sentiment === 'neutral' ? 50 : 30);
 
@@ -146,6 +146,19 @@
                 html += '<div class="section-card fade-in-up"><div class="section-header"><span class="section-title">📝 原始对话</span></div>';
                 html += '<div class="section-body"><div class="content-box">' + data.content + '</div></div></div>';
 
+                // 反馈区域
+                html += '<div class="section-card fade-in-up"><div class="section-header"><span class="section-title">💬 反馈</span></div>';
+                html += '<div class="section-body" style="text-align:center;padding:30px">';
+                html += '<p style="font-size:16px;color:#374151;margin-bottom:20px">这个分析对您有帮助吗？</p>';
+                html += '<div style="display:flex;justify-content:center;gap:16px">';
+                html += '<button class="btn btn-secondary" onclick="submitFeedback(\'helpful\')" style="padding:12px 24px">👍 有帮助</button>';
+                html += '<button class="btn btn-secondary" onclick="submitFeedback(\'not_helpful\')" style="padding:12px 24px">👎 需改进</button>';
+                html += '</div>';
+                html += '<div id="feedbackForm" style="display:none;margin-top:20px">';
+                html += '<textarea class="form-input" id="feedbackText" rows="3" placeholder="请告诉我们如何改进..." style="width:100%;max-width:500px"></textarea>';
+                html += '<button class="btn btn-primary" onclick="sendFeedback()" style="margin-top:12px">提交反馈</button>';
+                html += '</div></div></div>';
+
                 document.getElementById('analysisContent').innerHTML = html;
 
                 // 初始化图表
@@ -158,4 +171,76 @@
             var scoreCanvas = document.getElementById('scoreChart');
             if (scoreCanvas && typeof Chart !== 'undefined') {
                 var score = data.analysis.intent_score;
-                var scoreColor = window.utils.getScoreCo
+                var scoreColor = window.utils.getScoreColorHex(score);
+                new Chart(scoreCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [score, 100 - score],
+                            backgroundColor: [scoreColor, '#F3F4F6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '75%',
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            }
+
+            // 关键词柱状图
+            var keywordsCanvas = document.getElementById('keywordsChart');
+            if (keywordsCanvas && typeof Chart !== 'undefined') {
+                var keywords = data.analysis.keywords.slice(0, 5);
+                var counts = keywords.map(function() { return Math.floor(Math.random() * 10 + 3); });
+                new Chart(keywordsCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: keywords,
+                        datasets: [{
+                            label: '出现次数',
+                            data: counts,
+                            backgroundColor: '#3B82F6',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 3 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 反馈功能
+        function submitFeedback(type) {
+            if (type === 'not_helpful') {
+                document.getElementById('feedbackForm').style.display = 'block';
+            } else {
+                window.utils.showToast('感谢您的反馈！', 'success');
+            }
+        }
+
+        function sendFeedback() {
+            var text = document.getElementById('feedbackText').value;
+            if (!text) {
+                window.utils.showToast('请输入反馈内容', 'warning');
+                return;
+            }
+            // TODO: 调用后端API保存反馈
+            window.utils.showToast('感谢您的反馈，我们会持续改进！', 'success');
+            document.getElementById('feedbackForm').style.display = 'none';
+        }
+
+        // 加载分析
+        loadAnalysis();
+    </script>
+</body>
+</html>

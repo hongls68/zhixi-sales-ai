@@ -20,16 +20,17 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 1440))  # 24小时
 
 # ============ AI配置 ============
-AI_PROVIDER = os.getenv("AI_PROVIDER", "ollama")  # ollama 或 deepseek
+# AI提供商：api（兼容OpenAI）或 ollama（本地）
+AI_PROVIDER = os.getenv("AI_PROVIDER", "api")
 
-# Ollama配置（本地开发）
+# 兼容OpenAI的API配置
+API_BASE_URL = os.getenv("API_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+API_KEY = os.getenv("API_KEY", "tp-c8wqvgrfoaa6e721ii615h8tgat0b859p28gslczbijin7ea")
+API_MODEL = os.getenv("API_MODEL", "deepseek-chat")  # 或其他模型
+
+# Ollama配置（本地开发，备用）
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5")
-
-# DeepSeek配置（生产环境）
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
-DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
 # ============ CORS配置 ============
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5500")

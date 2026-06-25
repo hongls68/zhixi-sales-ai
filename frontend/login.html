@@ -374,42 +374,30 @@
                 </div>
 
                 <form class="login-form" id="loginForm" onsubmit="return false;">
-                    <!-- 手机号 -->
+                    <!-- 账号（手机号或用户名） -->
                     <div class="form-group">
-                        <label class="form-label">手机号</label>
-                        <div class="phone-input-group" id="phoneGroup">
-                            <span class="phone-prefix">+86</span>
-                            <input
-                                type="tel"
-                                id="phoneInput"
-                                placeholder="请输入手机号"
-                                maxlength="11"
-                                autocomplete="tel"
-                            >
-                        </div>
-                        <div class="form-error" id="phoneError" style="display: none;"></div>
+                        <label class="form-label">账号</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="accountInput"
+                            placeholder="请输入手机号或用户名"
+                            autocomplete="username"
+                        >
+                        <div class="form-error" id="accountError" style="display: none;"></div>
                     </div>
 
-                    <!-- 验证码 -->
+                    <!-- 密码 -->
                     <div class="form-group">
-                        <label class="form-label">验证码</label>
-                        <div class="code-input-group">
-                            <input
-                                type="text"
-                                id="codeInput"
-                                placeholder="请输入验证码"
-                                maxlength="6"
-                                autocomplete="one-time-code"
-                            >
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                id="sendCodeBtn"
-                            >
-                                发送验证码
-                            </button>
-                        </div>
-                        <div class="form-error" id="codeError" style="display: none;"></div>
+                        <label class="form-label">密码</label>
+                        <input
+                            type="password"
+                            class="form-input"
+                            id="passwordInput"
+                            placeholder="请输入密码"
+                            autocomplete="current-password"
+                        >
+                        <div class="form-error" id="passwordError" style="display: none;"></div>
                     </div>
 
                     <!-- 选项 -->
@@ -461,6 +449,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script src="static/js/auth.js"></script>
+    <script src="static/js/api.js"></script>
     <script src="static/js/utils.js"></script>
     <script>
         // 如果已登录，跳转到工作台
@@ -470,33 +459,28 @@
         }
 
         // DOM元素
-        var phoneInput = document.getElementById('phoneInput');
-        var codeInput = document.getElementById('codeInput');
-        var sendCodeBtn = document.getElementById('sendCodeBtn');
+        var accountInput = document.getElementById('accountInput');
+        var passwordInput = document.getElementById('passwordInput');
         var loginBtn = document.getElementById('loginBtn');
         var agreeCheckbox = document.getElementById('agreeCheckbox');
-        var phoneGroup = document.getElementById('phoneGroup');
-        var phoneError = document.getElementById('phoneError');
-        var codeError = document.getElementById('codeError');
-
-        var countdown = 0;
-        var countdownTimer = null;
+        var accountError = document.getElementById('accountError');
+        var passwordError = document.getElementById('passwordError');
 
         // 验证函数
-        function isValidPhone(phone) {
-            return /^1[3-9]\d{9}$/.test(phone);
-        }
-
-        function isValidCode(code) {
-            return /^\d{6}$/.test(code);
+        function isValidAccount(account) {
+            // 手机号：11位数字，1开头
+            var phoneRegex = /^1[3-9]\d{9}$/;
+            // 用户名：4-20位字母+数字
+            var usernameRegex = /^[a-zA-Z0-9]{4,20}$/;
+            return phoneRegex.test(account) || usernameRegex.test(account);
         }
 
         // 更新按钮状态
         function updateLoginBtn() {
-            var phone = phoneInput.value;
-            var code = codeInput.value;
+            var account = accountInput.value.trim();
+            var password = passwordInput.value;
             var agreed = agreeCheckbox.checked;
-            loginBtn.disabled = !(isValidPhone(phone) && isValidCode(code) && agreed);
+            loginBtn.disabled = !(account.length >= 4 && password.length >= 6 && agreed);
         }
 
         // 显示/隐藏错误
@@ -509,29 +493,28 @@
             element.style.display = 'none';
         }
 
-        // 实时验证 - 手机号
-        phoneInput.addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
-            hideError(phoneError);
-            phoneGroup.style.borderColor = '';
-            if (this.value.length === 11 && !isValidPhone(this.value)) {
-                phoneGroup.style.borderColor = '#EF4444';
-                showError(phoneError, '请输入正确的手机号');
-            } else if (this.value.length === 11 && isValidPhone(this.value)) {
-                phoneGroup.style.borderColor = '#10B981';
+        // 实时验证 - 账号
+        accountInput.addEventListener('input', function() {
+            hideError(accountError);
+            this.style.borderColor = '';
+            var account = this.value.trim();
+            if (account.length >= 4 && !isValidAccount(account)) {
+                this.style.borderColor = '#EF4444';
+                showError(accountError, '请输入正确的手机号或用户名（4-20位字母数字）');
+            } else if (account.length >= 4 && isValidAccount(account)) {
+                this.style.borderColor = '#10B981';
             }
             updateLoginBtn();
         });
 
-        // 实时验证 - 验证码
-        codeInput.addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
-            hideError(codeError);
+        // 实时验证 - 密码
+        passwordInput.addEventListener('input', function() {
+            hideError(passwordError);
             this.style.borderColor = '';
-            if (this.value.length === 6 && !isValidCode(this.value)) {
+            if (this.value.length > 0 && this.value.length < 6) {
                 this.style.borderColor = '#EF4444';
-                showError(codeError, '验证码为6位数字');
-            } else if (this.value.length === 6) {
+                showError(passwordError, '密码至少6位');
+            } else if (this.value.length >= 6) {
                 this.style.borderColor = '#10B981';
             }
             updateLoginBtn();
@@ -539,58 +522,20 @@
 
         agreeCheckbox.addEventListener('change', updateLoginBtn);
 
-        // 发送验证码
-        function sendCode() {
-            var phone = phoneInput.value;
-
-            if (!isValidPhone(phone)) {
-                phoneGroup.style.borderColor = '#EF4444';
-                showError(phoneError, '请输入正确的11位手机号');
-                return;
-            }
-
-            hideError(phoneError);
-            phoneGroup.style.borderColor = '';
-
-            sendCodeBtn.disabled = true;
-            countdown = 60;
-            sendCodeBtn.textContent = countdown + '秒后重试';
-
-            countdownTimer = setInterval(function() {
-                countdown--;
-                if (countdown <= 0) {
-                    clearInterval(countdownTimer);
-                    sendCodeBtn.disabled = false;
-                    sendCodeBtn.textContent = '发送验证码';
-                } else {
-                    sendCodeBtn.textContent = countdown + '秒后重试';
-                }
-            }, 1000);
-
-            window.auth.mockSendCode(phone).then(function() {
-                window.utils.showToast('验证码已发送', 'success');
-            }).catch(function(error) {
-                showError(phoneError, error.message);
-                clearInterval(countdownTimer);
-                sendCodeBtn.disabled = false;
-                sendCodeBtn.textContent = '发送验证码';
-            });
-        }
-
         // 登录
         function login() {
-            var phone = phoneInput.value;
-            var code = codeInput.value;
+            var account = accountInput.value.trim();
+            var password = passwordInput.value;
 
-            if (!isValidPhone(phone)) {
-                phoneGroup.style.borderColor = '#EF4444';
-                showError(phoneError, '请输入正确的11位手机号');
+            if (!account) {
+                accountInput.style.borderColor = '#EF4444';
+                showError(accountError, '请输入账号');
                 return;
             }
 
-            if (!isValidCode(code)) {
-                codeInput.style.borderColor = '#EF4444';
-                showError(codeError, '请输入6位验证码');
+            if (password.length < 6) {
+                passwordInput.style.borderColor = '#EF4444';
+                showError(passwordError, '密码至少6位');
                 return;
             }
 
@@ -599,18 +544,17 @@
                 return;
             }
 
-            hideError(phoneError);
-            hideError(codeError);
-            phoneGroup.style.borderColor = '';
-            codeInput.style.borderColor = '';
+            hideError(accountError);
+            hideError(passwordError);
+            accountInput.style.borderColor = '';
+            passwordInput.style.borderColor = '';
 
             // Loading状态
             loginBtn.disabled = true;
             loginBtn.querySelector('.btn-text').style.display = 'none';
-            loginBtn.querySelector('.btn-text').style.display = 'none';
             loginBtn.querySelector('.spinner').style.display = 'block';
 
-            window.auth.mockLogin(phone, code).then(function(result) {
+            window.api.login(account, password).then(function(result) {
                 window.auth.setAuth(result.token, result.user);
                 window.utils.showToast('登录成功', 'success');
 
@@ -619,7 +563,27 @@
                     window.location.href = params.get('redirect') || 'dashboard.html';
                 }, 1000);
             }).catch(function(error) {
-                showError(codeError, error.message);
-                codeInput.style.borderColor = '#EF4444';
+                showError(passwordError, error.message || '登录失败');
+                passwordInput.style.borderColor = '#EF4444';
             }).finally(function() {
-                
+                loginBtn.querySelector('.btn-text').style.display = 'block';
+                loginBtn.querySelector('.spinner').style.display = 'none';
+                updateLoginBtn();
+            });
+        }
+
+        // 事件监听
+        loginBtn.addEventListener('click', login);
+
+        // 回车提交
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !loginBtn.disabled) {
+                login();
+            }
+        });
+
+        // 初始化
+        updateLoginBtn();
+    </script>
+</body>
+</html>

@@ -14,10 +14,12 @@
       .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
       .nav-section{margin-bottom:8px}
       .nav-section-title{font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);padding:8px 12px;text-transform:uppercase;letter-spacing:0.5px}
-      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px}
+      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px;text-decoration:none}
       .nav-item:hover{background:var(--gray-100);color:var(--text-primary)}
       .nav-item.active{background:var(--primary-50);color:var(--primary-600);font-weight:500}
       .nav-item svg{width:18px;height:18px;flex-shrink:0}
+      .admin-only{display:none!important}
+      .admin-only.show{display:flex!important}
       .sidebar-user{padding:16px;border-top:1px solid var(--border-color);display:flex;align-items:center;gap:12px}
       .user-avatar-sm{width:36px;height:36px;border-radius:50%;background:var(--primary-100);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--primary-600);font-size:var(--text-sm);flex-shrink:0}
       .user-info-sm{flex:1;overflow:hidden}
@@ -100,8 +102,13 @@
                 </div>
                 <div class="nav-section">
                     <div class="nav-section-title">其他</div>
+                    <!-- 管理员入口（仅管理员可见） -->
+                    <a class="nav-item admin-only" href="admin.html" id="adminNav">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                        管理后台
+                    </a>
                     <a class="nav-item" href="profile.html">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>
                         设置
                     </a>
                     <a class="nav-item" href="#" id="logoutBtn">
@@ -256,9 +263,27 @@
 
         // 用户信息
         var user = window.auth.getUserInfo();
-        var name = user.nickname || user.phone || '用户';
+        var name = user.nickname || user.phone || user.username || '用户';
         document.getElementById('sidebarAvatar').textContent = name.charAt(0);
         document.getElementById('sidebarName').textContent = name;
+
+        // 检查并修复角色信息（支持 phone 或 username 为 admin）
+        var isAdmin = (user.phone === 'admin' || user.username === 'admin' || user.role === 'admin');
+        if (isAdmin && user.role !== 'admin') {
+            user.role = 'admin';
+            user.nickname = '管理员';
+            window.auth.setAuth(localStorage.getItem('zhixi_token'), user);
+        }
+
+        document.querySelector('.user-role-sm').textContent = isAdmin ? '管理员' : '免费版';
+
+        // 管理员显示管理后台入口
+        if (isAdmin) {
+            var adminNav = document.getElementById('adminNav');
+            if (adminNav) {
+                adminNav.classList.add('show');
+            }
+        }
 
         // 退出登录
         document.getElementById('logoutBtn').onclick = function() {
@@ -293,4 +318,74 @@
                         pointRadius: 5,
                         pointHoverRadius: 7
                     }]
-         
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 加载最近分析
+        function loadRecent() {
+            var listEl = document.getElementById('recentList');
+            listEl.innerHTML = window.utils.getSkeletonHTML(3);
+
+            window.api.getAnalysisList().then(function(data) {
+                if (data.list.length === 0) {
+                    listEl.innerHTML = window.utils.getEmptyStateHTML('📭', '暂无分析记录', '上传录音或粘贴对话，开始您的第一次AI分析', '开始分析', 'javascript:showTextInput()');
+                    return;
+                }
+
+                var html = '<div class="history-list">';
+                data.list.forEach(function(item) {
+                    var statusBadge = item.status === 'completed' ? '<span class="history-badge badge-completed">已完成</span>' : '<span class="history-badge badge-processing">分析中</span>';
+                    var score = item.score ? '<div class="history-score" style="color:' + window.utils.getScoreColor(item.score) + '">' + item.score + '</div>' : '<div class="history-score" style="color:var(--text-tertiary)">--</div>';
+                    var icon = item.type === 'sales_call' ? '📞' : (item.type === 'meeting' ? '🤝' : '📝');
+
+                    html += '<div class="history-item" onclick="window.location.href=\'analysis.html?id=' + item.id + '\'" style="animation:fadeInUp 0.3s ease ' + (data.list.indexOf(item) * 0.1) + 's both">';
+                    html += '<div class="history-icon">' + icon + '</div>';
+                    html += '<div class="history-info"><div class="history-title">' + item.title + '</div>';
+                    html += '<div class="history-meta"><span>' + window.utils.getAnalysisTypeName(item.type) + '</span><span>' + window.utils.timeAgo(item.created_at) + '</span></div></div>';
+                    html += score + statusBadge + '</div>';
+                });
+                html += '</div>';
+                listEl.innerHTML = html;
+            }).catch(function() {
+                listEl.innerHTML = window.utils.getEmptyStateHTML('❌', '加载失败', '请检查网络连接后重试', '刷新', 'javascript:loadRecent()');
+            });
+        }
+        loadRecent();
+
+        // 文本输入
+        function showTextInput() {
+            document.getElementById('textModal').classList.add('active');
+        }
+        function closeTextModal() {
+            document.getElementById('textModal').classList.remove('active');
+        }
+
+        function analyzeText() {
+            var text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                window.utils.showToast('请输入对话内容', 'warning');
+                return;
+            }
+            closeTextModal();
+            window.utils.showToast('正在分析...', 'info');
+
+            window.api.createAnalysis(text, '销售对话分析', 'sales_call').then(function(result) {
+                window.utils.showToast('分析完成', 'success');
+                window.location.href = 'analysis.html?id=' + result.id;
+            }).catch(function(err) {
+                window.utils.showToast('分析失败: ' + (err.message || '未知错误'), 'error');
+            });
+        }
+    </script>
+</body>
+</html>
