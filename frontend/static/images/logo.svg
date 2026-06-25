@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- 背景圆形 -->
+  <circle cx="100" cy="100" r="90" fill="url(#gradient)"/>
+
+  <!-- 大脑轮廓 -->
+  <path d="M100 50 C70 50 50 70 50 95 C50 105 55 115 60 120 C55 125 50 135 55 145 C60 155 70 160 80 160 L80 170 L120 170 L120 160 C130 160 140 155 145 145 C150 135 145 125 140 120 C145 115 150 105 150 95 C150 70 130 50 100 50Z" fill="white" fill-opacity="0.95"/>
+
+  <!-- 脑纹路 -->
+  <path d="M80 85 Q90 75 100 85 Q110 95 120 85" stroke="rgba(59,130,246,0.4)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M75 105 Q85 95 95 105 Q105 115 115 105 Q125 95 135 105" stroke="rgba(59,130,246,0.3)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M80 125 Q90 115 100 125 Q110 135 120 125" stroke="rgba(59,130,246,0.3)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- 数据流效果 -->
+  <circle cx="70" cy="90" r="4" fill="rgba(59,130,246,0.6)">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="90" cy="75" r="3" fill="rgba(59,130,246,0.5)">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="115" cy="80" r="3.5" fill="rgba(59,130,246,0.5)">
+    <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="130" cy="95" r="4" fill="rgba(59,130,246,0.6)">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 分析图表 -->
+  <rect x="65" y="140" width="8" height="20" rx="2" fill="white" fill-opacity="0.9"/>
+  <rect x="78" y="130" width="8" height="30" rx="2" fill="white" fill-opacity="0.9"/>
+  <rect x="91" y="135" width="8" height="25" rx="2" fill="white" fill-opacity="0.9"/>
+  <rect x="104" y="125" width="8" height="35" rx="2" fill="white" fill-opacity="0.9"/>
+  <rect x="117" y="132" width="8" height="28" rx="2" fill="white" fill-opacity="0.9"/>
+
+  <!-- 上升箭头 -->
+  <path d="M65 135 L90 115 L105 120 L135 100" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M125 98 L135 100 L133 110" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+</svg>

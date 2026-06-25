@@ -1,7 +1,7 @@
 """
-智析 AI - 数据模型包
+智析销售AI - 数据模型包
 """
-from models.user import User, Report, AccessLog
-from models.verification import EmailVerification
+from models.user import User
+from models.analysis import Analysis
 
-__all__ = ["User", "Report", "AccessLog", "EmailVerification"]
+__all__ = ["User", "Analysis"]

@@ -9,8 +9,17 @@ __pycache__/
 .env
 .env.local
 .env.production
+
+# 数据库
 *.db
 *.sqlite
+*.sqlite3
+zhixi_sales.db
+
+# AI模型
+models/
+*.bin
+*.gguf
 
 # IDE
 .vscode/
@@ -35,3 +44,6 @@ temp/
 # 构建产物
 dist/
 build/
+
+# Whisper模型缓存
+.whisper/

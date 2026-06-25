@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 智析销售AI</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+      .app-layout{display:flex;min-height:100vh;background:var(--bg-secondary)}
+      .sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-color);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+      .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border-color)}
+      .sidebar-logo img{width:28px;height:28px}.sidebar-logo span{font-size:var(--text-base);font-weight:700}
+      .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px;text-decoration:none}
+      .nav-item:hover{background:var(--gray-100);color:var(--text-primary)}
+      .nav-item.active{background:var(--primary-50);color:var(--primary-600);font-weight:500}
+      .nav-item svg{width:18px;height:18px;flex-shrink:0}
+      .nav-section-title{font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);padding:8px 12px;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px}
+      .main-area{margin-left:240px;flex:1;display:flex;flex-direction:column}
+      .topbar{height:56px;background:var(--bg-primary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:50;font-size:var(--text-lg);font-weight:600}
+      .content-area{flex:1;padding:24px;overflow-y:auto;max-width:800px}
+      .profile-card{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+      .profile-header{display:flex;align-items:center;gap:24px;margin-bottom:32px}
+      .profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary-400),var(--primary-600));display:flex;align-items:center;justify-content:center;font-size:var(--text-3xl);font-weight:700;color:white}
+      .profile-name{font-size:var(--text-2xl);font-weight:700;color:var(--text-primary)}
+      .profile-phone{font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px}
+      .profile-badge{display:inline-block;margin-top:8px}
+      .section-title{font-size:var(--text-lg);font-weight:600;color:var(--text-primary);margin-bottom:20px}
+      .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+      .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+      .stat-box{background:var(--gray-50);border-radius:var(--radius-md);padding:20px;text-align:center}
+      .stat-box-value{font-size:var(--text-2xl);font-weight:700;color:var(--primary-600)}
+      .stat-box-label{font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px}
+      .plan-card{display:flex;align-items:center;justify-content:space-between;padding:20px;background:linear-gradient(135deg,var(--primary-50),#EFF6FF);border:1px solid var(--primary-200);border-radius:var(--radius-lg)}
+      .plan-info{display:flex;align-items:center;gap:16px}
+      .plan-icon{width:48px;height:48px;background:var(--primary-100);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px}
+      .plan-name{font-size:var(--text-base);font-weight:600;color:var(--text-primary)}
+      .plan-desc{font-size:var(--text-sm);color:var(--text-secondary);margin-top:2px}
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo"><img src="static/images/logo.svg" alt="智析销售AI"><span>智析销售AI</span></a>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">主菜单</div>
+                <a class="nav-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
+                <a class="nav-item" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>分析记录</a>
+                <a class="nav-item" href="team.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>团队协作</a>
+                <div class="nav-section-title">其他</div>
+                <a class="nav-item active" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>设置</a>
+            </nav>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">个人中心</header>
+
+            <div class="content-area">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileAvatar">U</div>
+                        <div>
+                            <div class="profile-name" id="profileName">用户</div>
+                            <div class="profile-phone" id="profilePhone">138****8000</div>
+                            <span class="badge badge-primary profile-badge">免费版</span>
+                        </div>
+                    </div>
+
+                    <div class="section-title">使用统计</div>
+                    <div class="stat-grid">
+                        <div class="stat-box"><div class="stat-box-value">156</div><div class="stat-box-label">总分析次数</div></div>
+                        <div class="stat-box"><div class="stat-box-value">23</div><div class="stat-box-label">本月分析</div></div>
+                        <div class="stat-box"><div class="stat-box-value">82</div><div class="stat-box-label">平均评分</div></div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="plan-card">
+                        <div class="plan-info">
+                            <div class="plan-icon">⭐</div>
+                            <div>
+                                <div class="plan-name">免费版</div>
+                                <div class="plan-desc">每月可分析 30 次，支持基础功能</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="window.utils.showToast('升级功能即将上线','info')">升级会员</button>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="section-title">个人信息</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">昵称</label>
+                            <input type="text" class="form-input" id="editNickname" placeholder="设置昵称">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号</label>
+                            <input type="text" class="form-input" id="editPhone" disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">公司</label>
+                            <input type="text" class="form-input" id="editCompany" placeholder="填写公司名称">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">职位</label>
+                            <input type="text" class="form-input" id="editRole" placeholder="填写职位">
+                        </div>
+                    </div>
+                    <div style="margin-top:8px">
+                        <button class="btn btn-primary" onclick="saveProfile()">保存修改</button>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="section-title" style="color:var(--error)">危险操作</div>
+                    <div style="display:flex;gap:12px">
+                        <button class="btn btn-secondary" onclick="if(confirm('确定退出登录？'))window.auth.logout()">退出登录</button>
+                        <button class="btn btn-secondary" style="color:var(--error);border-color:var(--error)" onclick="window.utils.showToast('请联系客服处理','warning')">注销账号</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="static/js/auth.js"></script>
+    <script src="static/js/utils.js"></script>
+    <script>
+        if(!window.auth.isLoggedIn()){window.location.href='login.html'}
+
+        const user=window.auth.getUserInfo();
+        const name=user.nickname||'用户';
+        document.getElementById('profileAvatar').textContent=name.charAt(0);
+        document.getElementById('profileName').textContent=name;
+        document.getElementById('profilePhone').textContent=user.phone?user.phone.slice(0,3)+'****'+user.phone.slice(7):'未绑定';
+        document.getElementById('editNickname').value=user.nickname||'';
+        document.getElementById('editPhone').value=user.phone||'';
+        document.getElementById('editCompany').value=user.company||'';
+        document.getElementById('editRole').value=user.role||'';
+
+        function saveProfile(){
+            const nickname=document.getElementById('editNickname').value.trim();
+            const company=document.getElementById('editCompany').value.trim();
+            if(nickname)window.auth.updateUserInfo({nickname,company});
+            window.utils.showToast('保存成功','success');
+            document.getElementById('profileAvatar').textContent=(nickname||name).charAt(0);
+            document.getElementById('profileName').textContent=nickname||name;
+        }
+    </script>
+</body>
+</html>
+ 

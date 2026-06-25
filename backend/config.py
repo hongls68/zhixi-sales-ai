@@ -1,5 +1,5 @@
 """
-智析 AI - 配置文件
+智析销售AI - 配置文件
 """
 import os
 from dotenv import load_dotenv
@@ -7,33 +7,29 @@ from dotenv import load_dotenv
 # 加载环境变量
 load_dotenv()
 
-# 数据库配置（默认使用 SQLite 本地数据库）
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./zixiai.db")
+# ============ 服务配置 ============
+BACKEND_PORT = int(os.getenv("BACKEND_PORT", 8000))
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-# JWT 配置
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "weekly-report-pro-secret-key-2026")
+# ============ 数据库配置 ============
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./zhixi_sales.db")
+
+# ============ JWT配置 ============
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "zhixi-sales-ai-secret-key-2026")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))  # 7 天
+JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 1440))  # 24小时
 
-# 旧版 JWT 配置（兼容）
-SECRET_KEY = JWT_SECRET_KEY
-ALGORITHM = JWT_ALGORITHM
-ACCESS_TOKEN_EXPIRE_MINUTES = JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+# ============ AI配置 ============
+AI_PROVIDER = os.getenv("AI_PROVIDER", "ollama")  # ollama 或 deepseek
 
-# 邮件服务配置（QQ 邮箱示例）
-SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.qq.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME", "your-email@qq.com")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "your-smtp-password")  # 授权码，非登录密码
-SMTP_FROM = os.getenv("SMTP_FROM", "智析 AI <your-email@qq.com>")
+# Ollama配置（本地开发）
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5")
 
-# 前端地址（用于验证链接）
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+# DeepSeek配置（生产环境）
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
-# 验证码配置
-VERIFICATION_CODE_EXPIRE_MINUTES = 5  # 验证码有效期 5 分钟
-VERIFICATION_CODE_LENGTH = 6  # 验证码长度
-
-# 频率限制配置
-RATE_LIMIT_SECONDS = 60  # 1 分钟
-MAX_VERIFICATION_ATTEMPTS = 3  # 最多尝试 3 次
+# ============ CORS配置 ============
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5500")
