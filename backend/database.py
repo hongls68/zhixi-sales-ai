@@ -60,5 +60,6 @@ def init_db():
             print("[OK] 管理员账号已存在")
     except Exception as e:
         print(f"[WARN] 创建管理员失败: {e}")
+        db.rollback()
     finally:
         db.close()

@@ -1,6 +1,3 @@
-"""
-智析销售AI - 用户模型
-"""
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
@@ -8,20 +5,19 @@ from database import Base
 
 
 class User(Base):
-    """用户表"""
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    phone = Column(String(20), unique=True, index=True, nullable=False)  # 手机号（必填）
-    username = Column(String(50), unique=True, index=True, nullable=True)  # 用户名（选填）
-    email = Column(String(100), unique=True, index=True, nullable=True)  # 邮箱（选填）
+    phone = Column(String(20), unique=True, index=True, nullable=False)
+    username = Column(String(50), unique=True, index=True, nullable=True)
+    email = Column(String(100), unique=True, index=True, nullable=True)
     nickname = Column(String(50), default="")
     password_hash = Column(String(255), default="")
     avatar = Column(String(200), default="")
     company = Column(String(100), default="")
     job_title = Column(String(100), default="")
     industry = Column(String(50), default="")
-    role = Column(String(20), default="user")  # user / admin
+    role = Column(String(20), default="user")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -46,12 +42,11 @@ class User(Base):
 
 
 class AccessLog(Base):
-    """访问日志表"""
     __tablename__ = "access_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    action = Column(String(50), nullable=False)  # login / view / generate
+    action = Column(String(50), nullable=False)
     ip_address = Column(String(50), default="")
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -59,14 +54,13 @@ class AccessLog(Base):
 
 
 class OperationLog(Base):
-    """管理员操作日志表"""
     __tablename__ = "operation_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     admin_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     admin_name = Column(String(50), default="")
-    action = Column(String(50), nullable=False)  # delete_user / update_user / disable_user / enable_user / delete_analysis
-    target_type = Column(String(20), default="")  # user / analysis
+    action = Column(String(50), nullable=False)
+    target_type = Column(String(20), default="")
     target_id = Column(Integer, nullable=True)
     detail = Column(String(500), default="")
     ip_address = Column(String(50), default="")

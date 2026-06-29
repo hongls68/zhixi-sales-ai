@@ -1,6 +1,5 @@
 """
 智析销售AI - FastAPI 后端入口
-本地优先，API兜底
 """
 import sys
 import io

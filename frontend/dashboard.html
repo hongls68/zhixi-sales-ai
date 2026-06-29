@@ -383,7 +383,18 @@
                 window.utils.showToast('分析完成', 'success');
                 window.location.href = 'analysis.html?id=' + result.id;
             }).catch(function(err) {
-                window.utils.showToast('分析失败: ' + (err.message || '未知错误'), 'error');
+                // 修复错误处理：支持多种错误格式
+                var errorMsg = '分析失败';
+                if (typeof err === 'string') {
+                    errorMsg = err;
+                } else if (err && err.message) {
+                    errorMsg = err.message;
+                } else if (err && err.detail) {
+                    errorMsg = err.detail;
+                } else if (err && err.error) {
+                    errorMsg = err.error;
+                }
+                window.utils.showToast(errorMsg, 'error');
             });
         }
     </script>
