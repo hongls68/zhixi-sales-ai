@@ -171,6 +171,32 @@
       });
     },
 
+    // 分析配置
+    getAnalysisConfig: function() {
+      if (USE_API) {
+        return request('/analysis/config');
+      }
+      return new Promise(function(resolve) {
+        resolve({
+          styles: [
+            {value: 'professional', name: '正式商务'},
+            {value: 'concise', name: '简洁直接'},
+            {value: 'friendly', name: '亲和友好'}
+          ],
+          depths: [
+            {value: 'simple', name: '快速分析'},
+            {value: 'standard', name: '标准分析'},
+            {value: 'detailed', name: '深度分析'}
+          ],
+          languages: [
+            {value: 'zh', name: '中文'},
+            {value: 'en', name: 'English'},
+            {value: 'mixed', name: '中英混合'}
+          ]
+        });
+      });
+    },
+
     // 分析
     getAnalysisList: function(params) {
       if (USE_API) {
@@ -187,11 +213,18 @@
       return mockData.getAnalysisDetail(id);
     },
 
-    createAnalysis: function(content, title, type) {
+    createAnalysis: function(content, title, type, style, depth, language) {
       if (USE_API) {
         return request('/analysis/create', {
           method: 'POST',
-          body: JSON.stringify({ content: content, title: title, type: type })
+          body: JSON.stringify({
+            content: content,
+            title: title,
+            type: type,
+            style: style || 'professional',
+            depth: depth || 'standard',
+            language: language || 'zh'
+          })
         });
       }
       // Mock

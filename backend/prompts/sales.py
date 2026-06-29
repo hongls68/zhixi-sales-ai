@@ -1,151 +1,102 @@
 """
-智析销售AI - 提示词管理
+智析销售AI - 提示词管理 v2.0
 """
 
-# 基础提示词
-BASE_PROMPT = """
-你是一位资深的销售分析专家，拥有10年销售管理和培训经验。
+STYLES = {
+    "professional": {"name": "正式商务", "prefix": "你是一位资深的销售分析专家，拥有10年大客户销售和管理经验。请用正式、专业的商务语言进行分析。"},
+    "concise": {"name": "简洁直接", "prefix": "你是一位高效的销售分析助手。请用简洁、直接的语言，重点突出，避免冗余。"},
+    "friendly": {"name": "亲和友好", "prefix": "你是一位经验丰富的销售顾问。请用亲和、易懂的语言，像朋友一样给出建议。"}
+}
 
-## 你的任务
-分析以下销售对话/通话记录，提供专业的分析报告。
+DEPTHS = {
+    "simple": {"name": "快速分析", "instruction": "请进行快速分析，提供核心要点即可，每个维度2-3条。"},
+    "standard": {"name": "标准分析", "instruction": "请进行全面分析，每个维度3-5条，包含具体细节。"},
+    "detailed": {"name": "深度分析", "instruction": "请进行深度分析，每个维度5-8条，包含具体细节和可执行建议。"}
+}
+
+LANGUAGES = {
+    "zh": {"name": "中文", "instruction": "请用中文输出所有分析内容。"},
+    "en": {"name": "English", "instruction": "Please output all analysis content in English."},
+    "mixed": {"name": "中英混合", "instruction": "请用中文输出分析内容，专业术语保留英文。"}
+}
+
+BASE_PROMPT = """{style_prefix}
+
+## 分析任务
+请分析以下销售对话/沟通记录，从多个维度提供专业洞察。
+{depth_instruction}
+{language_instruction}
 
 ## 分析维度
-1. **客户意图识别** - 客户的真实需求和痛点是什么？
-2. **购买意向评分** - 0-100分，评估成交可能性
-3. **关键异议点** - 客户的顾虑和反对意见
-4. **销售话术评估** - 销售人员的表现亮点和不足
-5. **改进建议** - 具体可执行的下一步行动
+
+### 1. 客户意向度评估
+- **高意向**：明确表达购买意愿，讨论具体细节（价格、时间、数量）
+- **中意向**：表示感兴趣，但有顾虑或需要考虑
+- **低意向**：只是了解，没有明确购买意向
+
+### 2. 关键需求提取
+- 客户明确提到的需求
+- 客户暗示但未明说的需求
+
+### 3. 客户痛点
+- 客户当前面临的问题和困扰
+- 阻碍成交的因素
+
+### 4. 情绪变化分析
+- 对话开始时客户的态度
+- 讨论过程中的情绪变化
+- 结束时的最终态度
+
+### 5. 行动建议
+- 短期跟进（1-3天）
+- 中期策略（1-2周）
+
+### 6. 风险预警
+- 可能导致丢单的风险点
+
+### 7. 关键词提取
+- 提取3-8个对话中的关键词
 
 ## 输出格式
-请严格按以下JSON格式输出，不要添加其他内容：
+请严格按以下JSON格式输出，不要添加任何其他内容：
 
 ```json
 {{
-  "intent_score": 78,
-  "sentiment": "positive",
-  "key_points": [
-    "客户对产品功能表示认可",
-    "价格是主要考虑因素"
-  ],
-  "risks": [
-    "客户可能还在对比其他竞品"
-  ],
-  "suggestions": [
-    "明天准时发送方案",
-    "突出性价比优势"
-  ],
-  "keywords": ["价格", "优惠", "方案"]
+  "intent": "high",
+  "intent_score": 85,
+  "key_needs": ["需求1", "需求2"],
+  "pain_points": ["痛点1", "痛点2"],
+  "emotion_trend": "情绪变化描述",
+  "action_suggestions": ["建议1", "建议2"],
+  "risks": ["风险1"],
+  "keywords": ["关键词1", "关键词2"]
 }}
 ```
 
-## 对话内容
+## 待分析的对话内容
+
 {content}
-
-## 注意事项
-- 建议要具体可执行，不要空泛
-- 识别客户的真实痛点
-- 关注成交信号和阻碍因素
 """
 
-# 行业扩展提示词
-INDUSTRY_PROMPTS = {
-    "教育": """
-## 行业背景
-这是教育行业的销售对话，重点关注：
-- 课程效果和学员成果
-- 师资力量和教学质量
-- 学习方式（线上/线下/混合）
-- 价格与价值的匹配度
-""",
-    "软件": """
-## 行业背景
-这是软件/SaaS销售对话，重点关注：
-- ROI（投资回报率）
-- 实施周期和上线时间
-- 技术支持和售后服务
-- 数据安全和合规性
-""",
-    "房地产": """
-## 行业背景
-这是房产销售对话，重点关注：
-- 地段和周边配套
-- 价格走势和投资回报
-- 付款方式和贷款政策
-- 交付时间和质量保障
-""",
-    "金融": """
-## 行业背景
-这是金融产品销售对话，重点关注：
-- 风险等级和收益预期
-- 合规性和监管要求
-- 流动性和退出机制
-- 客户风险承受能力
-""",
-    "电商": """
-## 行业背景
-这是电商/零售销售对话，重点关注：
-- 供应链和库存管理
-- 物流配送时效
-- 售后服务和退换政策
-- 批量采购优惠
-"""
-}
 
-# 角色扩展提示词
-ROLE_PROMPTS = {
-    "销售员": """
-## 用户角色
-用户是一线销售员，请重点分析：
-- 销售话术技巧
-- 客户沟通方法
-- 具体改进建议
-""",
-    "销售经理": """
-## 用户角色
-用户是销售经理，请重点分析：
-- 团队管理建议
-- 培训方向
-- 流程优化建议
-""",
-    "创业者": """
-## 用户角色
-用户是创业者，请重点分析：
-- 商业模式洞察
-- 市场机会识别
-- 竞争态势分析
-""",
-    "产品经理": """
-## 用户角色
-用户是产品经理，请重点分析：
-- 客户需求洞察
-- 产品改进方向
-- 竞品对比分析
-"""
-}
-
-
-def build_prompt(content: str, user_context: dict = None) -> str:
-    """
-    构建完整提示词
-
-    Args:
-        content: 对话内容
-        user_context: 用户上下文 {"industry": "教育", "role": "销售经理"}
-
-    Returns:
-        完整提示词
-    """
-    prompt = BASE_PROMPT.format(content=content)
-
-    if user_context:
-        # 添加行业背景
-        industry = user_context.get("industry")
-        if industry and industry in INDUSTRY_PROMPTS:
-            prompt += "\n" + INDUSTRY_PROMPTS[industry]
-
-        # 添加角色建议
-        role = user_context.get("role")
-        if role and role in ROLE_PROMPTS:
-            prompt += "\n" + ROLE_PROMPTS[role]
-
+def build_prompt(content, style="professional", depth="standard", language="zh"):
+    style_config = STYLES.get(style, STYLES["professional"])
+    depth_config = DEPTHS.get(depth, DEPTHS["standard"])
+    lang_config = LANGUAGES.get(language, LANGUAGES["zh"])
+    prompt = BASE_PROMPT.format(
+        style_prefix=style_config["prefix"],
+        depth_instruction=depth_config["instruction"],
+        language_instruction=lang_config["instruction"],
+        content=content
+    )
     return prompt
+
+
+def get_style_options():
+    return [{"value": k, "name": v["name"]} for k, v in STYLES.items()]
+
+def get_depth_options():
+    return [{"value": k, "name": v["name"]} for k, v in DEPTHS.items()]
+
+def get_language_options():
+    return [{"value": k, "name": v["name"]} for k, v in LANGUAGES.items()]

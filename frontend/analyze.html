@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建分析 - 智析销售AI</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+      .app-layout{display:flex;min-height:100vh;background:var(--bg-secondary)}
+      .sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-color);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+      .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border-color);text-decoration:none}
+      .sidebar-logo img{width:28px;height:28px}.sidebar-logo span{font-size:var(--text-base);font-weight:700;color:var(--text-primary)}
+      .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+      .nav-section-title{font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);padding:8px 12px;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px}
+      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px;text-decoration:none}
+      .nav-item:hover{background:var(--gray-100);color:var(--text-primary)}
+      .nav-item.active{background:var(--primary-50);color:var(--primary-600);font-weight:500}
+      .nav-item svg{width:18px;height:18px;flex-shrink:0}
+      .main-area{margin-left:240px;flex:1;display:flex;flex-direction:column}
+      .topbar{height:56px;background:var(--bg-primary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:50}
+      .content-area{flex:1;padding:24px;max-width:900px;margin:0 auto;width:100%}
+
+      /* 输入区域 */
+      .input-section{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+      .input-title{font-size:var(--text-2xl);font-weight:700;color:var(--text-primary);margin-bottom:8px}
+      .input-subtitle{font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:24px}
+      .textarea-wrapper{position:relative;margin-bottom:24px}
+      .analysis-textarea{width:100%;min-height:200px;padding:16px;border:2px solid var(--border-color);border-radius:var(--radius-lg);font-size:var(--text-base);line-height:1.6;resize:vertical;transition:border-color var(--transition-fast);font-family:inherit}
+      .analysis-textarea:focus{outline:none;border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100)}
+      .analysis-textarea::placeholder{color:var(--text-tertiary)}
+      .char-count{position:absolute;bottom:12px;right:12px;font-size:var(--text-xs);color:var(--text-tertiary)}
+      .type-selector{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+      .type-option{padding:8px 16px;border:2px solid var(--border-color);border-radius:var(--radius-lg);cursor:pointer;font-size:var(--text-sm);transition:all var(--transition-fast);display:flex;align-items:center;gap:8px}
+      .type-option:hover{border-color:var(--primary-300)}
+      .type-option.active{border-color:var(--primary-500);background:var(--primary-50);color:var(--primary-600)}
+      .analyze-btn{width:100%;padding:16px;font-size:var(--text-lg);font-weight:600}
+
+      /* 结果区域 */
+      .result-section{display:none;animation:fadeIn 0.5s ease}
+      .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+      .result-title{font-size:var(--text-2xl);font-weight:700;color:var(--text-primary)}
+      .result-actions{display:flex;gap:12px}
+
+      /* 意向度标签 */
+      .intent-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-lg);font-weight:600;font-size:var(--text-base)}
+      .intent-high{background:#dcfce7;color:#166534}.intent-high::before{content:'●';color:#22c55e}
+      .intent-medium{background:#fef3c7;color:#92400e}.intent-medium::before{content:'●';color:#f59e0b}
+      .intent-low{background:#fee2e2;color:#991b1b}.intent-low::before{content:'●';color:#ef4444}
+
+      /* 分析卡片 */
+      .analysis-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+      .analysis-card{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:24px;transition:all var(--transition-base)}
+      .analysis-card:hover{box-shadow:var(--shadow-md)}
+      .analysis-card.full-width{grid-column:1/-1}
+      .card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+      .card-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:20px}
+      .card-icon.blue{background:var(--primary-100)}.card-icon.green{background:var(--success-light)}.card-icon.orange{background:var(--warning-light)}.card-icon.red{background:var(--error-light)}
+      .card-title{font-size:var(--text-base);font-weight:600;color:var(--text-primary)}
+      .card-content{font-size:var(--text-sm);color:var(--text-secondary);line-height:1.8}
+      .card-content ul{margin:0;padding-left:20px}
+      .card-content li{margin-bottom:8px}
+      .risk-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:#fef2f2;border-radius:var(--radius-md);margin-bottom:8px}
+      .risk-icon{color:var(--error);font-size:14px;margin-top:2px}
+
+      /* 保存按钮 */
+      .save-section{margin-top:24px;text-align:center}
+
+      /* 详情弹窗 */
+      .detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
+      .detail-modal.active{display:flex}
+      .detail-content{background:var(--bg-primary);border-radius:var(--radius-xl);max-width:700px;width:90%;max-height:90vh;overflow-y:auto;padding:32px}
+      .detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+      .detail-title{font-size:var(--text-xl);font-weight:700}
+      .detail-close{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gray-100);transition:background var(--transition-fast)}
+      .detail-close:hover{background:var(--gray-200)}
+
+      @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+      @media(max-width:768px){
+        .sidebar{display:none}.main-area{margin-left:0}
+        .analysis-cards{grid-template-columns:1fr}
+        .type-selector{flex-direction:column}
+      }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo">
+                <img src="static/images/logo.svg" alt="智析销售AI">
+                <span>智析销售AI</span>
+            </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">主菜单</div>
+                <a class="nav-item" href="app.html#dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
+                <a class="nav-item active" href="analyze.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>新建分析</a>
+                <a class="nav-item" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>分析记录</a>
+                <a class="nav-item" href="app.html#team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>团队协作</a>
+                <div class="nav-section-title">其他</div>
+                <a class="nav-item" href="app.html#profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>设置</a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <div class="main-area">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:16px">
+                    <a href="app.html" class="btn btn-ghost btn-sm">← 返回工作台</a>
+                    <h1 style="font-size:var(--text-lg);font-weight:600">新建分析</h1>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- 输入区域 -->
+                <div class="input-section" id="inputSection">
+                    <h2 class="input-title">分析销售对话</h2>
+                    <p class="input-subtitle">粘贴销售通话记录、会议纪要或客户沟通内容，AI将自动分析并提供洞察</p>
+
+                    <!-- 分析类型选择 -->
+                    <div class="type-selector">
+                        <div class="type-option active" data-type="sales_call" onclick="selectType(this)">
+                            📞 销售通话
+                        </div>
+                        <div class="type-option" data-type="meeting" onclick="selectType(this)">
+                            📋 会议记录
+                        </div>
+                        <div class="type-option" data-type="interview" onclick="selectType(this)">
+                            📝 访谈调研
+                        </div>
+                    </div>
+
+                    <!-- 分析配置选项 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">分析风格</label>
+                            <select class="form-input" id="styleSelect">
+                                <option value="professional">正式商务</option>
+                                <option value="concise">简洁直接</option>
+                                <option value="friendly">亲和友好</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">分析深度</label>
+                            <select class="form-input" id="depthSelect">
+                                <option value="simple">快速分析</option>
+                                <option value="standard" selected>标准分析</option>
+                                <option value="detailed">深度分析</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">输出语言</label>
+                            <select class="form-input" id="languageSelect">
+                                <option value="zh">中文</option>
+                                <option value="en">English</option>
+                                <option value="mixed">中英混合</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 文本输入 -->
+                    <div class="textarea-wrapper">
+                        <textarea class="analysis-textarea" id="contentInput"
+                            placeholder="粘贴销售对话内容...&#10;&#10;示例：&#10;客户：你们这个产品的主要优势是什么？&#10;销售：我们主要有三个优势...&#10;客户：价格方面有没有优惠？"
+                            oninput="updateCharCount()"></textarea>
+                        <span class="char-count" id="charCount">0 / 5000</span>
+                    </div>
+
+                    <!-- 分析按钮 -->
+                    <button class="btn btn-primary analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+                        <span class="btn-text">开始分析</span>
+                        <div class="spinner" style="display:none"></div>
+                    </button>
+                </div>
+
+                <!-- 分析结果区域 -->
+                <div class="result-section" id="resultSection">
+                    <div class="result-header">
+                        <h2 class="result-title">📊 分析结果</h2>
+                        <div class="result-actions">
+                            <button class="btn btn-secondary" onclick="copyResult()">📋 复制结果</button>
+                            <button class="btn btn-primary" onclick="saveToHistory()">💾 保存到记录</button>
+                        </div>
+                    </div>
+
+                    <!-- 意向度 -->
+                    <div style="margin-bottom:24px;text-align:center">
+                        <span class="intent-badge" id="intentBadge">高意向</span>
+                    </div>
+
+                    <!-- 分析卡片 -->
+                    <div class="analysis-cards">
+                        <!-- 关键需求 -->
+                        <div class="analysis-card">
+                            <div class="card-header">
+                                <div class="card-icon blue">🎯</div>
+                                <h3 class="card-title">关键需求</h3>
+                            </div>
+                            <div class="card-content" id="keyNeeds">
+                                <ul>
+                                    <li>...</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 客户痛点 -->
+                        <div class="analysis-card">
+                            <div class="card-header">
+                                <div class="card-icon orange">😤</div>
+                                <h3 class="card-title">客户痛点</h3>
+                            </div>
+                            <div class="card-content" id="painPoints">
+                                <ul>
+                                    <li>...</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 情绪变化 -->
+                        <div class="analysis-card full-width">
+                            <div class="card-header">
+                                <div class="card-icon green">😊</div>
+                                <h3 class="card-title">情绪变化</h3>
+                            </div>
+                            <div class="card-content" id="emotionTrend">...</div>
+                        </div>
+
+                        <!-- 行动建议 -->
+                        <div class="analysis-card full-width">
+                            <div class="card-header">
+                                <div class="card-icon green">💡</div>
+                                <h3 class="card-title">下一步行动建议</h3>
+                            </div>
+                            <div class="card-content" id="actionSuggestions">
+                                <ul>
+                                    <li>...</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 风险预警 -->
+                        <div class="analysis-card full-width" id="riskCard" style="display:none">
+                            <div class="card-header">
+                                <div class="card-icon red">⚠️</div>
+                                <h3 class="card-title">风险预警</h3>
+                            </div>
+                            <div class="card-content" id="riskWarnings"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-content">
+            <div class="detail-header">
+                <h3 class="detail-title" id="detailTitle">分析详情</h3>
+                <div class="detail-close" onclick="closeDetailModal()">✕</div>
+            </div>
+            <div id="detailBody"></div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="static/js/auth.js"></script>
+    <script src="static/js/utils.js"></script>
+    <script>
+        // 检查登录状态
+        if (window.auth && !window.auth.isLoggedIn()) {
+            window.location.href = 'login.html';
+        }
+
+        var selectedType = 'sales_call';
+        var currentResult = null;
+
+        // 选择分析类型
+        function selectType(element) {
+            document.querySelectorAll('.type-option').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            element.classList.add('active');
+            selectedType = element.dataset.type;
+        }
+
+        // 更新字数统计
+        function updateCharCount() {
+            var text = document.getElementById('contentInput').value;
+            var count = text.length;
+            document.getElementById('charCount').textContent = count + ' / 5000';
+            document.getElementById('analyzeBtn').disabled = count < 10;
+        }
+
+        // 开始分析
+        function startAnalysis() {
+            var content = document.getElementById('contentInput').value.trim();
+            if (content.length < 10) {
+                showToast('请输入至少10个字符的内容', 'warning');
+                return;
+            }
+
+            var btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.querySelector('.btn-text').style.display = 'none';
+            btn.querySelector('.spinner').style.display = 'block';
+
+            // 获取配置选项
+            var style = document.getElementById('styleSelect').value;
+            var depth = document.getElementById('depthSelect').value;
+            var language = document.getElementById('languageSelect').value;
+
+            // 调用API或使用Mock数据
+            if (window.api) {
+                window.api.createAnalysis(content, content.substring(0, 20) + '...', selectedType, style, depth, language)
+                    .then(function(result) {
+                        displayResult(result);
+                    })
+                    .catch(function(err) {
+                        showToast('分析失败: ' + (err.message || '未知错误'), 'error');
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.querySelector('.btn-text').style.display = 'block';
+                        btn.querySelector('.spinner').style.display = 'none';
+                    });
+            } else {
+                // Mock分析
+                setTimeout(function() {
+                    var mockResult = generateMockResult(content);
+                    displayResult(mockResult);
+                    btn.disabled = false;
+                    btn.querySelector('.btn-text').style.display = 'block';
+                    btn.querySelector('.spinner').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // 生成Mock结果
+        function generateMockResult(content) {
+            var intents = ['high', 'medium', 'low'];
+            var intent = intents[Math.floor(Math.random() * 3)];
+
+            return {
+                id: Date.now(),
+                title: content.substring(0, 20) + '...',
+                type: selectedType,
+                content: content,
+                created_at: new Date().toISOString(),
+                analysis: {
+                    intent: intent,
+                    intent_score: intent === 'high' ? 85 : (intent === 'medium' ? 60 : 35),
+                    key_needs: [
+                        '对产品核心功能感兴趣',
+                        '关注性价比',
+                        '需要了解售后服务'
+                    ],
+                    pain_points: [
+                        '预算有限，需要控制成本',
+                        '担心理实施周期过长',
+                        '对数据安全性有顾虑'
+                    ],
+                    emotion_trend: '客户整体情绪积极，从最初的怀疑逐渐转变为认可，最后表达出明确的购买意向。在讨论价格时略有犹豫，但在了解优惠政策后情绪回升。',
+                    action_suggestions: [
+                        '3天内发送详细报价方案',
+                        '安排产品演示，重点展示核心功能',
+                        '准备竞品对比资料',
+                        '设置7天后跟进提醒'
+                    ],
+                    risks: intent === 'low' ? ['客户可能在对比其他竞品', '决策周期可能较长'] : []
+                }
+            };
+        }
+
+        // 显示分析结果
+        function displayResult(result) {
+            currentResult = result;
+            var analysis = result.analysis;
+
+            // 意向度
+            var intentBadge = document.getElementById('intentBadge');
+            var intentText = analysis.intent === 'high' ? '高意向' : (analysis.intent === 'medium' ? '中意向' : '低意向');
+            intentBadge.textContent = intentText;
+            intentBadge.className = 'intent-badge intent-' + analysis.intent;
+
+            // 关键需求
+            var keyNeedsHtml = '<ul>';
+            analysis.key_needs.forEach(function(need) {
+                keyNeedsHtml += '<li>' + need + '</li>';
+            });
+            keyNeedsHtml += '</ul>';
+            document.getElementById('keyNeeds').innerHTML = keyNeedsHtml;
+
+            // 客户痛点
+            var painPointsHtml = '<ul>';
+            analysis.pain_points.forEach(function(point) {
+                painPointsHtml += '<li>' + point + '</li>';
+            });
+            painPointsHtml += '</ul>';
+            document.getElementById('painPoints').innerHTML = painPointsHtml;
+
+            // 情绪变化
+            document.getElementById('emotionTrend').textContent = analysis.emotion_trend;
+
+            // 行动建议
+            var suggestionsHtml = '<ul>';
+            analysis.action_suggestions.forEach(function(suggestion) {
+                suggestionsHtml += '<li>' + suggestion + '</li>';
+            });
+            suggestionsHtml += '</ul>';
+            document.getElementById('actionSuggestions').innerHTML = suggestionsHtml;
+
+            // 风险预警
+            var riskCard = document.getElementById('riskCard');
+            if (analysis.risks && analysis.risks.length > 0) {
+                riskCard.style.display = 'block';
+                var risksHtml = '';
+                analysis.risks.forEach(function(risk) {
+                    risksHtml += '<div class="risk-item"><span class="risk-icon">⚠️</span><span>' + risk + '</span></div>';
+                });
+                document.getElementById('riskWarnings').innerHTML = risksHtml;
+            } else {
+                riskCard.style.display = 'none';
+            }
+
+            // 显示结果区域
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 保存到历史记录（已通过API自动保存，这里只是跳转）
+        function saveToHistory() {
+            if (!currentResult) return;
+            showToast('已保存到分析记录', 'success');
+            setTimeout(function() {
+                window.location.href = 'history.html';
+            }, 1000);
+        }
+
+        // 复制结果
+        function copyResult() {
+            if (!currentResult) return;
+
+            var text = '分析结果\n\n';
+            text += '意向度: ' + (currentResult.analysis.intent === 'high' ? '高' : (currentResult.analysis.intent === 'medium' ? '中' : '低')) + '\n\n';
+            text += '关键需求:\n' + currentResult.analysis.key_needs.map(function(n) { return '- ' + n; }).join('\n') + '\n\n';
+            text += '客户痛点:\n' + currentResult.analysis.pain_points.map(function(p) { return '- ' + p; }).join('\n') + '\n\n';
+            text += '行动建议:\n' + currentResult.analysis.action_suggestions.map(function(s) { return '- ' + s; }).join('\n');
+
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('已复制到剪贴板', 'success');
+            });
+        }
+
+        // Toast提示
+        function showToast(message, type) {
+            if (window.utils) {
+                window.utils.showToast(message, type);
+            } else {
+                alert(message);
+            }
+        }
+
+        // 初始化
+        updateCharCount();
+    </script>
+</body>
+</html>
