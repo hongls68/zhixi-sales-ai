@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原文解读 - 智析AI</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+      .app-layout{display:flex;min-height:100vh;background:var(--bg-secondary)}
+      .sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-color);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+      .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border-color);text-decoration:none}
+      .sidebar-logo img{width:28px;height:28px}.sidebar-logo span{font-size:var(--text-base);font-weight:700;color:var(--text-primary)}
+      .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+      .nav-section-title{font-size:var(--text-xs);font-weight:600;color:var(--text-tertiary);padding:8px 12px;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px}
+      .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-secondary);cursor:pointer;transition:all var(--transition-fast);margin-bottom:2px;text-decoration:none}
+      .nav-item:hover{background:var(--gray-100);color:var(--text-primary)}
+      .nav-item.active{background:var(--primary-50);color:var(--primary-600);font-weight:500}
+      .nav-item svg{width:18px;height:18px;flex-shrink:0}
+      .main-area{margin-left:240px;flex:1;display:flex;flex-direction:column}
+      .topbar{height:56px;background:var(--bg-primary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:50}
+
+      /* ========== 页面布局 ========== */
+      .interpret-page{padding:24px;height:calc(100vh - 56px);display:flex;flex-direction:column}
+
+      /* 顶部标题区 */
+      .page-header{text-align:center;margin-bottom:20px;flex-shrink:0}
+      .page-title{
+        font-size:24px;font-weight:700;margin:0 0 8px 0;
+        background:linear-gradient(135deg,var(--primary-600),var(--primary-400));
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      }
+      .page-subtitle{font-size:14px;color:var(--text-secondary);margin:0}
+
+      /* 文本类型选择 */
+      .text-type-selector{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-shrink:0;flex-wrap:wrap}
+      .type-btn{
+        display:flex;align-items:center;gap:6px;padding:10px 18px;
+        background:var(--bg-primary);border:2px solid var(--border-color);
+        border-radius:50px;cursor:pointer;font-size:13px;font-weight:500;
+        color:var(--text-secondary);transition:all 0.25s ease;
+      }
+      .type-btn:hover{border-color:var(--primary-300);color:var(--primary-600)}
+      .type-btn.active{
+        background:linear-gradient(135deg,var(--primary-500),var(--primary-600));
+        border-color:var(--primary-500);color:white;
+      }
+      .type-btn .icon{font-size:16px}
+
+      /* 双栏主布局 */
+      .interpret-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+
+      /* 通用面板样式 */
+      .panel{
+        background:var(--bg-primary);border:1px solid var(--border-color);
+        border-radius:16px;display:flex;flex-direction:column;overflow:hidden;
+      }
+      .panel-header{
+        display:flex;align-items:center;justify-content:space-between;
+        padding:14px 18px;border-bottom:1px solid var(--border-color);
+        background:linear-gradient(180deg,#fafbfc 0%,#fff 100%);
+        flex-shrink:0;
+      }
+      .panel-title{
+        display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text-primary);
+      }
+      .panel-title .icon{font-size:18px}
+      .panel-actions{display:flex;gap:8px}
+      .panel-btn{
+        padding:5px 10px;font-size:12px;border-radius:6px;border:1px solid var(--border-color);
+        background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;
+        transition:all 0.2s;display:flex;align-items:center;gap:4px;
+      }
+      .panel-btn:hover{border-color:var(--primary-400);color:var(--primary-600)}
+      .panel-btn svg{width:13px;height:13px}
+      .panel-content{flex:1;overflow-y:auto;padding:16px}
+
+      /* 原文面板 */
+      .original-textarea{
+        width:100%;height:100%;border:none;resize:none;font-family:inherit;
+        font-size:14px;line-height:1.8;color:var(--text-primary);background:transparent;
+      }
+      .original-textarea:focus{outline:none}
+      .original-textarea::placeholder{color:var(--text-tertiary)}
+
+      /* 解读面板 - 空白状态 */
+      .interpretation-placeholder{
+        height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        text-align:center;padding:30px;
+      }
+      .interpretation-placeholder .icon{font-size:48px;margin-bottom:16px;opacity:0.4}
+      .interpretation-placeholder .title{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+      .interpretation-placeholder .desc{font-size:13px;color:var(--text-tertiary);max-width:260px}
+
+      /* 解读内容区 */
+      .interpretation-content{display:none;height:100%;overflow-y:auto}
+      .interpretation-content.active{display:block}
+      .interpretation-meta{
+        display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;
+      }
+      .meta-tag{
+        display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+        background:var(--primary-50);color:var(--primary-600);border-radius:20px;
+        font-size:12px;font-weight:500;
+      }
+      .meta-tag.warning{background:#fef3c7;color:#92400e}
+      .meta-tag.danger{background:#fee2e2;color:#991b1b}
+      .meta-tag.success{background:#d1fae5;color:#166534}
+
+      /* 解读卡片 */
+      .interpret-card{
+        background:var(--bg-secondary);border-radius:10px;padding:16px;margin-bottom:12px;
+        border:1px solid var(--border-color);
+      }
+      .interpret-card:last-child{margin-bottom:0}
+      .interpret-card-title{
+        display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;
+        color:var(--text-primary);margin-bottom:10px;
+      }
+      .interpret-card-title .tag{
+        padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;
+      }
+      .interpret-card-title .tag.blue{background:var(--primary-100);color:var(--primary-600)}
+      .interpret-card-title .tag.orange{background:var(--warning-light);color:#92400e}
+      .interpret-card-title .tag.red{background:var(--error-light);color:#991b1b}
+      .interpret-card-title .tag.green{background:var(--success-light);color:#166534}
+      .interpret-card-content{font-size:13px;line-height:1.7;color:var(--text-secondary)}
+      .interpret-card-content strong{color:var(--text-primary)}
+
+      /* 分析按钮 */
+      .analyze-wrapper{text-align:center;padding:16px 0;flex-shrink:0}
+      .analyze-btn{
+        display:inline-flex;align-items:center;justify-content:center;gap:8px;
+        padding:14px 40px;font-size:15px;font-weight:600;border-radius:50px;
+        background:linear-gradient(135deg,var(--primary-500),var(--primary-600));
+        color:white;border:none;cursor:pointer;transition:all 0.3s;
+        box-shadow:0 4px 16px rgba(59,130,246,0.35);
+      }
+      .analyze-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 24px rgba(59,130,246,0.45)}
+      .analyze-btn:disabled{opacity:0.5;cursor:not-allowed}
+      .analyze-btn .spinner{
+        width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);
+        border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;display:none;
+      }
+      .analyze-btn.loading .spinner{display:block}
+      .analyze-btn.loading .btn-text{display:none}
+      @keyframes spin{to{transform:rotate(360deg)}}
+
+      /* Loading状态 */
+      .loading-analysis{
+        height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        text-align:center;padding:30px;
+      }
+      .loading-dots{display:flex;gap:5px;margin-bottom:12px}
+      .loading-dots span{
+        width:8px;height:8px;border-radius:50%;background:var(--primary-400);
+        animation:bounce 1.4s infinite ease-in-out both;
+      }
+      .loading-dots span:nth-child(1){animation-delay:-0.32s}
+      .loading-dots span:nth-child(2){animation-delay:-0.16s}
+      @keyframes bounce{0%,80%,100%{transform:scale(0)}50%{transform:scale(1)}}
+      .loading-text{font-size:13px;color:var(--text-tertiary)}
+
+      /* 响应式 */
+      @media(max-width:900px){
+        .interpret-layout{grid-template-columns:1fr}
+        .panel{height:350px}
+      }
+      @media(max-width:768px){
+        .sidebar{display:none}.main-area{margin-left:0}
+        .type-selector{flex-wrap:wrap}
+      }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo">
+                <img src="static/images/logo.svg" alt="智析AI">
+                <span>智析AI</span>
+            </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">主菜单</div>
+                <a class="nav-item" href="app.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
+                <a class="nav-item" href="analyze.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>销售对话分析</a>
+                <a class="nav-item active" href="contract.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>原文解读</a>
+                <a class="nav-item" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>分析记录</a>
+                <div class="nav-section-title">其他</div>
+                <a class="nav-item" href="app.html#settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>设置</a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <div class="main-area">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:16px">
+                    <a href="app.html" class="nav-item" style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;text-decoration:none;font-size:13px">← 返回</a>
+                    <h1 style="font-size:var(--text-lg);font-weight:600">原文解读</h1>
+                </div>
+            </header>
+
+            <div class="interpret-page">
+                <!-- 标题区 -->
+                <div class="page-header">
+                    <h2 class="page-title">智能原文解读</h2>
+                    <p class="page-subtitle">输入任意文本，AI将自动分析内容结构、提取关键信息并提供专业解读</p>
+                </div>
+
+                <!-- 文本类型选择 -->
+                <div class="text-type-selector">
+                    <div class="type-btn active" data-type="通用文本" onclick="selectTextType(this)">
+                        <span class="icon">📝</span><span>通用文本</span>
+                    </div>
+                    <div class="type-btn" data-type="合同协议" onclick="selectTextType(this)">
+                        <span class="icon">📄</span><span>合同协议</span>
+                    </div>
+                    <div class="type-btn" data-type="文章报告" onclick="selectTextType(this)">
+                        <span class="icon">📰</span><span>文章报告</span>
+                    </div>
+                    <div class="type-btn" data-type="邮件往来" onclick="selectTextType(this)">
+                        <span class="icon">📧</span><span>邮件往来</span>
+                    </div>
+                    <div class="type-btn" data-type="聊天记录" onclick="selectTextType(this)">
+                        <span class="icon">💬</span><span>聊天记录</span>
+                    </div>
+                    <div class="type-btn" data-type="产品文档" onclick="selectTextType(this)">
+                        <span class="icon">📚</span><span>产品文档</span>
+                    </div>
+                </div>
+
+                <!-- 双栏布局 -->
+                <div class="interpret-layout">
+                    <!-- 原文面板 -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <span class="icon">📋</span>
+                                <span>原始文本</span>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="panel-btn" onclick="pasteFromClipboard()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                    粘贴
+                                </button>
+                                <button class="panel-btn" onclick="clearText()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <textarea class="original-textarea" id="originalText" placeholder="请在此粘贴需要解读的文本内容...
+
+支持类型：
+• 合同协议条款
+• 文章报告段落
+• 邮件往来内容
+• 聊天对话记录
+• 产品说明文档
+• 任意文本内容"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 解读面板 -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <span class="icon">🤖</span>
+                                <span>AI解读</span>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="panel-btn" onclick="copyInterpretation()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <!-- 空白状态 -->
+                            <div class="interpretation-placeholder" id="placeholder">
+                                <div class="icon">📊</div>
+                                <div class="title">等待分析</div>
+                                <div class="desc">在左侧输入文本内容，点击下方"开始解读"按钮获取AI智能分析结果</div>
+                            </div>
+
+                            <!-- Loading状态 -->
+                            <div class="loading-analysis" id="loadingState" style="display:none">
+                                <div class="loading-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="loading-text">正在分析文本内容...</div>
+                            </div>
+
+                            <!-- 解读结果 -->
+                            <div class="interpretation-content" id="interpretationResult">
+                                <div class="interpretation-meta" id="interpretationMeta"></div>
+                                <div id="interpretationCards"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分析按钮 -->
+                <div class="analyze-wrapper">
+                    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeText()">
+                        <span class="btn-text">✨ 开始智能解读</span>
+                        <div class="spinner"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTextType = '通用文本';
+
+        // 选择文本类型
+        function selectTextType(btn) {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTextType = btn.dataset.type;
+        }
+
+        // 从剪贴板粘贴
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('originalText').value = text;
+                updateAnalyzeBtn();
+            } catch (err) {
+                showToast('无法访问剪贴板，请手动粘贴', 'error');
+            }
+        }
+
+        // 清空文本
+        function clearText() {
+            document.getElementById('originalText').value = '';
+            updateAnalyzeBtn();
+        }
+
+        // 更新分析按钮状态
+        function updateAnalyzeBtn() {
+            const text = document.getElementById('originalText').value.trim();
+            document.getElementById('analyzeBtn').disabled = !text;
+        }
+
+        // 分析文本
+        async function analyzeText() {
+            const text = document.getElementById('originalText').value.trim();
+            if (!text) {
+                showToast('请输入文本内容', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            const placeholder = document.getElementById('placeholder');
+            const loadingState = document.getElementById('loadingState');
+            const resultDiv = document.getElementById('interpretationResult');
+
+            btn.classList.add('loading');
+            placeholder.style.display = 'none';
+            resultDiv.classList.remove('active');
+            loadingState.style.display = 'flex';
+
+            // 模拟AI分析
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 生成解读结果
+            const result = generateInterpretation(text);
+            displayInterpretation(result);
+
+            btn.classList.remove('loading');
+            loadingState.style.display = 'none';
+            resultDiv.classList.add('active');
+        }
+
+        // 根据类型生成解读
+        function generateInterpretation(text) {
+            const cards = [];
+            const risks = [];
+            const length = text.length;
+
+            // 文本类型识别
+            cards.push({
+                type: 'blue',
+                title: '文本类型识别',
+                content: `根据文本特征分析，这是一份<strong>${selectedTextType}</strong>。文本长度约${length}字，内容结构${length > 500 ? '较为完整' : '相对简短'}。`
+            });
+
+            // 文本特征分析
+            if (length > 1000) {
+                cards.push({
+                    type: 'blue',
+                    title: '内容结构分析',
+                    content: '文本内容较为丰富，包含多个信息层次。建议关注各部分之间的逻辑关联性和重点内容的提炼。'
+                });
+            } else if (length > 300) {
+                cards.push({
+                    type: 'blue',
+                    title: '内容概述',
+                    content: '文本内容适中，信息量基本完整。建议核对关键信息是否准确表达。'
+                });
+            }
+
+            // 关键词提取
+            const keywords = extractKeywords(text);
+            if (keywords.length > 0) {
+                cards.push({
+                    type: 'blue',
+                    title: '关键信息提取',
+                    content: `识别到以下关键信息：<strong>${keywords.join('、')}</strong>。这些是文本的核心内容点。`
+                });
+            }
+
+            // 类型特定分析
+            if (selectedTextType === '合同协议') {
+                analyzeContract(text, cards, risks);
+            } else if (selectedTextType === '邮件往来') {
+                analyzeEmail(text, cards, risks);
+            } else if (selectedTextType === '聊天记录') {
+                analyzeChat(text, cards, risks);
+            } else if (selectedTextType === '文章报告') {
+                analyzeArticle(text, cards, risks);
+            }
+
+            // 风险检测
+            if (text.includes('免责声明') || text.includes('不承担') || text.includes('概不负责')) {
+                risks.push({ level: 'warning', text: '含免责声明条款' });
+            }
+            if (text.includes('违约金') || text.includes('赔偿')) {
+                risks.push({ level: 'warning', text: '含赔偿约定' });
+            }
+            if (length < 200) {
+                risks.push({ level: 'danger', text: '内容较少' });
+            }
+
+            // 综合建议
+            cards.push({
+                type: 'green',
+                title: '综合建议',
+                content: `根据${selectedTextType}的特点，建议：<br>• 仔细核对关键信息准确性<br>• 关注重点条款的具体含义<br>• 确认是否需要进一步补充完善`
+            });
+
+            risks.push({ level: 'success', text: 'AI已分析' });
+
+            return { cards, risks };
+        }
+
+        // 提取关键词
+        function extractKeywords(text) {
+            const commonWords = ['的', '是', '在', '了', '和', '与', '或', '及', '等', '包括', '以及', '关于', '根据', '对于', '甲方', '乙方', '双方', '本', '该', '上述', '以下'];
+            const words = text.replace(/[，。、；：""''（）【】《》]/g, ' ').split(/\s+/).filter(w => w.length >= 2 && !commonWords.includes(w));
+            const freq = {};
+            words.forEach(w => freq[w] = (freq[w] || 0) + 1);
+            return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 5).map(e => e[0]);
+        }
+
+        // 合同分析
+        function analyzeContract(text, cards, risks) {
+            if (text.includes('价格') || text.includes('金额') || text.includes('付款')) {
+                cards.push({ type: 'blue', title: '价款条款', content: '涉及款项约定，建议明确付款方式、时间和金额细节。' });
+            }
+            if (text.includes('期限') || text.includes('时间') || text.includes('日期')) {
+                cards.push({ type: 'orange', title: '时间节点', content: '包含时间约定，需注意各节点的具体日期和期限计算方式。' });
+            }
+            if (text.includes('违约') || text.includes('责任')) {
+                cards.push({ type: 'red', title: '违约责任', content: '涉及违约条款，需仔细审查违约金比例和赔偿范围的合理性。' });
+                risks.push({ level: 'warning', text: '含违约条款' });
+            }
+        }
+
+        // 邮件分析
+        function analyzeEmail(text, cards, risks) {
+            cards.push({ type: 'blue', title: '邮件特征', content: '识别为邮件往来内容，包含沟通意图和相关信息。建议确认发件人身份和邮件来源可靠性。' });
+            if (text.includes('请') || text.includes('希望') || text.includes('要求')) {
+                cards.push({ type: 'orange', title: '行动请求', content: '邮件中包含请求或要求，建议及时响应并跟进处理。' });
+            }
+        }
+
+        // 聊天记录分析
+        function analyzeChat(text, cards, risks) {
+            cards.push({ type: 'blue', title: '对话特征', content: '识别为对话记录，包含多方交流内容。建议关注各方的立场和诉求点。' });
+        }
+
+        // 文章分析
+        function analyzeArticle(text, cards, risks) {
+            cards.push({ type: 'blue', title: '文章结构', content: '识别为文章或报告类型。建议关注论点论据的完整性和逻辑连贯性。' });
+        }
+
+        // 显示解读结果
+        function displayInterpretation(result) {
+            const metaHtml = result.risks.map(r => `<span class="meta-tag ${r.level}">${r.text}</span>`).join('');
+            document.getElementById('interpretationMeta').innerHTML = metaHtml;
+
+            const tagLabels = { blue: '解读', orange: '提示', red: '风险', green: '建议' };
+            const cardsHtml = result.cards.map(card => `
+                <div class="interpret-card">
+                    <div class="interpret-card-title">
+                        <span class="tag ${card.type}">${tagLabels[card.type]}</span>
+                        ${card.title}
+                    </div>
+                    <div class="interpret-card-content">${card.content}</div>
+                </div>
+            `).join('');
+            document.getElementById('interpretationCards').innerHTML = cardsHtml;
+        }
+
+        // 复制解读内容
+        function copyInterpretation() {
+            const resultDiv = document.getElementById('interpretationResult');
+            if (!resultDiv.classList.contains('active')) {
+                showToast('暂无解读内容可复制', 'error');
+                return;
+            }
+
+            const cards = document.querySelectorAll('.interpret-card');
+            let text = `【AI原文解读报告 - ${selectedTextType}】\n\n`;
+            cards.forEach(card => {
+                const title = card.querySelector('.interpret-card-title').textContent.trim();
+                const content = card.querySelector('.interpret-card-content').innerText;
+                text += `【${title}】\n${content}\n\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('已复制到剪贴板', 'success');
+            });
+        }
+
+        // Toast提示
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `position:fixed;bottom:24px;right:24px;padding:10px 20px;background:${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'};color:white;border-radius:8px;font-size:13px;z-index:9999;animation:slideIn 0.3s ease`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideOut 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 2500);
+        }
+
+        // 初始化
+        document.getElementById('originalText').addEventListener('input', updateAnalyzeBtn);
+        updateAnalyzeBtn();
+    </script>
+</body>
+</html>
