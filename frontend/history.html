@@ -18,59 +18,87 @@
       .nav-item svg{width:18px;height:18px;flex-shrink:0}
       .main-area{margin-left:240px;flex:1;display:flex;flex-direction:column}
       .topbar{height:56px;background:var(--bg-primary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
-      .content-area{flex:1;padding:24px}
+      .content-area{flex:1;padding:24px;max-width:1200px}
 
-      /* 搜索栏 */
-      .search-section{display:flex;gap:12px;margin-bottom:24px}
-      .search-input{flex:1;padding:12px 16px;border:2px solid var(--border-color);border-radius:var(--radius-lg);font-size:var(--text-base);transition:border-color var(--transition-fast)}
-      .search-input:focus{outline:none;border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100)}
+      /* 页面标题 */
+      .page-header{margin-bottom:24px}
+      .page-title{font-size:24px;font-weight:700;color:var(--text-primary);margin:0 0 8px 0;background:linear-gradient(135deg,var(--primary-600),var(--primary-400));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+      .page-subtitle{font-size:14px;color:var(--text-secondary);margin:0}
+
+      /* 统计概览 */
+      .stats-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+      .stat-mini{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:12px;padding:16px;text-align:center}
+      .stat-mini-value{font-size:24px;font-weight:700;color:var(--primary-600)}
+      .stat-mini-label{font-size:12px;color:var(--text-secondary);margin-top:4px}
+
+      /* 筛选栏 */
+      .filter-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+      .filter-input{flex:1;min-width:200px;padding:10px 16px;border:2px solid var(--border-color);border-radius:10px;font-size:14px;transition:all 0.2s}
+      .filter-input:focus{outline:none;border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100)}
+      .filter-select{padding:10px 16px;border:2px solid var(--border-color);border-radius:10px;font-size:14px;background:var(--bg-primary);cursor:pointer;min-width:130px}
+      .filter-select:focus{outline:none;border-color:var(--primary-500)}
+      .filter-btn{padding:10px 20px;background:var(--primary-500);color:white;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s}
+      .filter-btn:hover{background:var(--primary-600)}
 
       /* 记录列表 */
-      .history-list{display:flex;flex-direction:column;gap:16px}
-      .history-card{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all var(--transition-fast);display:flex;align-items:center;gap:16px}
-      .history-card:hover{box-shadow:var(--shadow-md);border-color:var(--primary-300);transform:translateY(-2px)}
-      .history-icon{width:48px;height:48px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--primary-100);flex-shrink:0}
+      .history-list{display:flex;flex-direction:column;gap:12px}
+      .history-card{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all 0.25s ease;display:flex;align-items:center;gap:16px}
+      .history-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.08);border-color:var(--primary-300);transform:translateY(-2px)}
+      .history-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+      .history-icon.sales{background:linear-gradient(135deg,#DBEAFE,#BFDBFE)}
+      .history-icon.meeting{background:linear-gradient(135deg,#FEF3C7,#FDE68A)}
+      .history-icon.interview{background:linear-gradient(135deg,#D1FAE5,#A7F3D0)}
+      .history-icon.contract{background:linear-gradient(135deg,#EDE9FE,#DDD6FE)}
       .history-info{flex:1;min-width:0}
-      .history-title{font-size:var(--text-base);font-weight:600;color:var(--text-primary);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .history-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-      .history-type{padding:4px 10px;border-radius:var(--radius-sm);font-size:var(--text-xs);background:var(--gray-100);color:var(--text-secondary)}
-      .history-time{font-size:var(--text-xs);color:var(--text-tertiary)}
-      .history-intent{flex-shrink:0}
-      .history-actions{display:flex;gap:8px;flex-shrink:0}
-
-      /* 意向度标签 */
-      .intent-tag{padding:6px 14px;border-radius:var(--radius-lg);font-weight:600;font-size:var(--text-sm)}
-      .intent-high{background:#dcfce7;color:#166534}
-      .intent-medium{background:#fef3c7;color:#92400e}
-      .intent-low{background:#fee2e2;color:#991b1b}
+      .history-title{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .history-summary{font-size:13px;color:var(--text-secondary);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .history-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+      .history-type{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;background:var(--gray-100);color:var(--text-secondary)}
+      .history-time{font-size:12px;color:var(--text-tertiary);display:flex;align-items:center;gap:4px}
+      .history-score{flex-shrink:0}
+      .score-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-weight:600;font-size:14px}
+      .score-high{background:#dcfce7;color:#166534}.score-medium{background:#fef3c7;color:#92400e}.score-low{background:#fee2e2;color:#991b1b}
+      .history-actions{display:flex;gap:6px;flex-shrink:0;opacity:0;transition:opacity 0.2s}
+      .history-card:hover .history-actions{opacity:1}
+      .action-btn{padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-primary);cursor:pointer;transition:all 0.2s;font-size:13px}
+      .action-btn:hover{background:var(--gray-100)}
+      .action-btn.danger:hover{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
 
       /* 空状态 */
-      .empty-state{text-align:center;padding:80px 20px}
-      .empty-icon{font-size:64px;margin-bottom:16px}
-      .empty-title{font-size:var(--text-xl);font-weight:600;color:var(--text-primary);margin-bottom:8px}
-      .empty-desc{font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:24px}
+      .empty-state{text-align:center;padding:80px 20px;background:var(--bg-primary);border-radius:16px;border:1px solid var(--border-color)}
+      .empty-icon{font-size:72px;margin-bottom:20px;opacity:0.5}
+      .empty-title{font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:8px}
+      .empty-desc{font-size:14px;color:var(--text-secondary);margin-bottom:24px}
+      .quick-links{display:flex;justify-content:center;gap:12px;margin-top:16px}
+      .quick-link{padding:10px 20px;border:1px solid var(--border-color);border-radius:8px;text-decoration:none;font-size:14px;color:var(--text-primary);transition:all 0.2s}
+      .quick-link:hover{background:var(--primary-50);border-color:var(--primary-300);color:var(--primary-600)}
 
       /* 详情弹窗 */
       .detail-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
       .detail-modal.active{display:flex}
-      .detail-content{background:var(--bg-primary);border-radius:var(--radius-xl);max-width:700px;width:90%;max-height:90vh;overflow-y:auto;padding:32px}
+      .detail-content{background:var(--bg-primary);border-radius:16px;max-width:700px;width:92%;max-height:90vh;overflow-y:auto;padding:28px}
       .detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border-color)}
-      .detail-title{font-size:var(--text-xl);font-weight:700}
-      .detail-close{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gray-100);transition:background var(--transition-fast);font-size:18px}
+      .detail-title{font-size:18px;font-weight:700;color:var(--text-primary)}
+      .detail-close{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gray-100);transition:background 0.2s;font-size:18px}
       .detail-close:hover{background:var(--gray-200)}
-      .detail-section{margin-bottom:24px}
-      .detail-section-title{font-size:var(--text-base);font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-      .detail-text{font-size:var(--text-sm);color:var(--text-secondary);line-height:1.8;white-space:pre-wrap}
-      .detail-list{list-style:disc;padding-left:20px}
-      .detail-list li{font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px;line-height:1.6}
-      .detail-original{background:var(--bg-secondary);padding:16px;border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--text-primary);line-height:1.8;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+      .detail-section{margin-bottom:20px}
+      .detail-section-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+      .detail-tags{display:flex;flex-wrap:wrap;gap:8px}
+      .detail-tag{padding:6px 12px;border-radius:6px;font-size:13px;background:var(--gray-100);color:var(--text-secondary)}
+      .detail-text{font-size:14px;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap}
+      .detail-original{background:var(--bg-secondary);padding:16px;border-radius:10px;font-size:13px;color:var(--text-primary);line-height:1.7;white-space:pre-wrap;max-height:180px;overflow-y:auto}
 
       @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
+      @media(max-width:900px){
+        .stats-overview{grid-template-columns:repeat(2,1fr)}
+        .filter-bar{flex-direction:column}
+        .filter-input{min-width:100%}
+      }
       @media(max-width:768px){
         .sidebar{display:none}.main-area{margin-left:0}
-        .history-card{flex-direction:column;align-items:flex-start}
-        .history-actions{width:100%;justify-content:flex-end}
+        .history-card{flex-wrap:wrap}
+        .history-actions{width:100%;opacity:1}
       }
     </style>
 </head>
@@ -79,17 +107,17 @@
         <!-- 侧边栏 -->
         <aside class="sidebar">
             <a href="/" class="sidebar-logo">
-                <img src="static/images/logo.svg" alt="智析销售AI">
-                <span>智析销售AI</span>
+                <img src="static/images/logo.svg" alt="智析AI">
+                <span>智析AI</span>
             </a>
             <nav class="sidebar-nav">
                 <div class="nav-section-title">主菜单</div>
-                <a class="nav-item" href="app.html#dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
-                <a class="nav-item" href="analyze.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>新建分析</a>
-                <a class="nav-item active" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>分析记录</a>
-                <a class="nav-item" href="app.html#team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>团队协作</a>
+                <a class="nav-item" href="app.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>工作台</a>
+                <a class="nav-item" href="analyze.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>销售对话分析</a>
+                <a class="nav-item" href="contract.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>原文解读</a>
+                <a class="nav-item active" href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>分析记录</a>
                 <div class="nav-section-title">其他</div>
-                <a class="nav-item" href="app.html#profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>设置</a>
+                <a class="nav-item" href="app.html#settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>设置</a>
             </nav>
         </aside>
 
@@ -97,22 +125,61 @@
         <div class="main-area">
             <header class="topbar">
                 <div style="display:flex;align-items:center;gap:16px">
-                    <a href="app.html" class="btn btn-ghost btn-sm">← 返回工作台</a>
+                    <a href="app.html" class="nav-item" style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;text-decoration:none;font-size:13px">← 返回</a>
                     <h1 style="font-size:var(--text-lg);font-weight:600">分析记录</h1>
                 </div>
-                <a href="analyze.html" class="btn btn-primary">+ 新建分析</a>
+                <div style="display:flex;gap:8px">
+                    <a href="analyze.html" class="filter-btn" style="text-decoration:none">+ 新建分析</a>
+                </div>
             </header>
 
             <div class="content-area">
-                <!-- 搜索栏 -->
-                <div class="search-section">
-                    <input type="text" class="search-input" id="searchInput" placeholder="搜索分析记录..." oninput="filterHistory()">
+                <!-- 页面标题 -->
+                <div class="page-header">
+                    <h2 class="page-title">历史分析</h2>
+                    <p class="page-subtitle">查看和管理您的所有分析记录，支持搜索和筛选</p>
+                </div>
+
+                <!-- 统计概览 -->
+                <div class="stats-overview">
+                    <div class="stat-mini">
+                        <div class="stat-mini-value" id="statTotal">0</div>
+                        <div class="stat-mini-label">总记录数</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-value" id="statHigh">0</div>
+                        <div class="stat-mini-label">高意向</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-value" id="statMedium">0</div>
+                        <div class="stat-mini-label">中意向</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-value" id="statThisMonth">0</div>
+                        <div class="stat-mini-label">本月新增</div>
+                    </div>
+                </div>
+
+                <!-- 筛选栏 -->
+                <div class="filter-bar">
+                    <input type="text" class="filter-input" id="searchInput" placeholder="🔍 搜索标题或内容..." oninput="filterHistory()">
+                    <select class="filter-select" id="typeFilter" onchange="filterHistory()">
+                        <option value="">全部类型</option>
+                        <option value="sales_call">销售通话</option>
+                        <option value="meeting">会议记录</option>
+                        <option value="interview">访谈调研</option>
+                        <option value="contract">合同协议</option>
+                    </select>
+                    <select class="filter-select" id="intentFilter" onchange="filterHistory()">
+                        <option value="">全部意向</option>
+                        <option value="high">高意向</option>
+                        <option value="medium">中意向</option>
+                        <option value="low">低意向</option>
+                    </select>
                 </div>
 
                 <!-- 记录列表 -->
-                <div class="history-list" id="historyList">
-                    <!-- 动态填充 -->
-                </div>
+                <div class="history-list" id="historyList"></div>
             </div>
         </div>
     </div>
@@ -140,61 +207,69 @@
 
         var allHistory = [];
 
-        // 加载历史记录 - 从API获取
+        // 加载历史记录
         function loadHistory() {
             var listEl = document.getElementById('historyList');
-            listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">加载中...</div>';
+            listEl.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-secondary)">加载中...</div>';
 
             if (window.api) {
                 window.api.getAnalysisList().then(function(data) {
                     allHistory = data.list || [];
                     if (allHistory.length === 0) {
-                        // 如果没有数据，显示示例
                         allHistory = getMockHistory();
                     }
-                    renderHistory(allHistory);
+                    updateStats();
+                    filterHistory();
                 }).catch(function() {
-                    // API失败，使用Mock数据
                     allHistory = getMockHistory();
-                    renderHistory(allHistory);
+                    updateStats();
+                    filterHistory();
                 });
             } else {
                 allHistory = getMockHistory();
-                renderHistory(allHistory);
+                updateStats();
+                filterHistory();
             }
         }
 
         // Mock历史数据
         function getMockHistory() {
             return [
-                {
-                    id: 1,
-                    title: '客户A产品咨询分析',
-                    type: 'sales_call',
-                    status: 'completed',
-                    created_at: new Date(Date.now() - 3600000).toISOString(),
-                    analysis: { intent: 'high', intent_score: 82, key_needs: ['产品功能', '价格优惠'] },
-                    summary_brief: '客户对产品表现出强烈兴趣，重点讨论了功能和价格，计划下周签约。'
-                },
-                {
-                    id: 2,
-                    title: '团队周会会议记录',
-                    type: 'meeting',
-                    status: 'completed',
-                    created_at: new Date(Date.now() - 86400000).toISOString(),
-                    analysis: { intent: 'medium', intent_score: 65, key_needs: ['Q3目标', '资源分配'] },
-                    summary_brief: '会议讨论了Q3销售目标和资源分配问题，确定了下一步行动计划。'
-                },
-                {
-                    id: 3,
-                    title: '客户需求调研访谈',
-                    type: 'interview',
-                    status: 'completed',
-                    created_at: new Date(Date.now() - 172800000).toISOString(),
-                    analysis: { intent: 'medium', intent_score: 58, key_needs: ['定制化需求', '售后支持'] },
-                    summary_brief: '客户提出了定制化需求，对售后支持有较高期望，需要进一步沟通方案。'
-                }
+                { id: 1, title: '客户A产品咨询分析', type: 'sales_call', status: 'completed', created_at: new Date(Date.now() - 3600000).toISOString(), analysis: { intent: 'high', intent_score: 82, key_needs: ['产品功能', '价格优惠'] }, summary_brief: '客户对产品表现出强烈兴趣，重点讨论了功能和价格，计划下周签约。' },
+                { id: 2, title: '销售合同审查', type: 'contract', status: 'completed', created_at: new Date(Date.now() - 7200000).toISOString(), analysis: { intent: 'medium', intent_score: 65 }, summary_brief: '合同涉及多条款审查，建议关注付款方式和违约责任部分。' },
+                { id: 3, title: '团队周会会议记录', type: 'meeting', status: 'completed', created_at: new Date(Date.now() - 86400000).toISOString(), analysis: { intent: 'medium', intent_score: 58 }, summary_brief: '会议讨论了Q3销售目标和资源分配问题，确定了下一步行动计划。' },
+                { id: 4, title: '客户需求调研访谈', type: 'interview', status: 'completed', created_at: new Date(Date.now() - 172800000).toISOString(), analysis: { intent: 'low', intent_score: 35 }, summary_brief: '客户提出了定制化需求，对售后支持有较高期望。' },
+                { id: 5, title: '客户B合作洽谈', type: 'sales_call', status: 'completed', created_at: new Date(Date.now() - 259200000).toISOString(), analysis: { intent: 'high', intent_score: 88 }, summary_brief: '客户表示强烈合作意向，预算充足，预计本月签约。' }
             ];
+        }
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allHistory.length;
+            document.getElementById('statHigh').textContent = allHistory.filter(h => h.analysis && h.analysis.intent === 'high').length;
+            document.getElementById('statMedium').textContent = allHistory.filter(h => h.analysis && h.analysis.intent === 'medium').length;
+            var thisMonth = allHistory.filter(h => {
+                var d = new Date(h.created_at);
+                var now = new Date();
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).length;
+            document.getElementById('statThisMonth').textContent = thisMonth;
+        }
+
+        // 筛选历史记录
+        function filterHistory() {
+            var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            var typeFilter = document.getElementById('typeFilter').value;
+            var intentFilter = document.getElementById('intentFilter').value;
+
+            var filtered = allHistory.filter(function(item) {
+                if (keyword && !(item.title && item.title.toLowerCase().includes(keyword)) && !(item.summary_brief && item.summary_brief.toLowerCase().includes(keyword))) return false;
+                if (typeFilter && item.type !== typeFilter) return false;
+                if (intentFilter && (item.analysis ? item.analysis.intent : '') !== intentFilter) return false;
+                return true;
+            });
+
+            renderHistory(filtered);
         }
 
         // 渲染历史记录
@@ -202,56 +277,40 @@
             var listEl = document.getElementById('historyList');
 
             if (data.length === 0) {
-                listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">暂无分析记录</div><div class="empty-desc">点击「新建分析」开始您的第一次AI分析</div><a href="analyze.html" class="btn btn-primary">新建分析</a></div>';
+                listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">暂无分析记录</div><div class="empty-desc">开始您的第一次AI分析，享受智能洞察</div><div class="quick-links"><a href="analyze.html" class="quick-link">📞 销售对话分析</a><a href="contract.html" class="quick-link">📝 原文解读</a></div></div>';
                 return;
             }
 
             var html = '';
             data.forEach(function(item, index) {
-                var icon = item.type === 'sales_call' ? '📞' : (item.type === 'meeting' ? '📋' : '📝');
-                var typeName = item.type === 'sales_call' ? '销售通话' : (item.type === 'meeting' ? '会议记录' : '访谈调研');
-                var intentClass = 'intent-' + (item.analysis ? item.analysis.intent : 'medium');
-                var intentText = item.analysis ? (item.analysis.intent === 'high' ? '高意向' : (item.analysis.intent === 'medium' ? '中意向' : '低意向')) : '未知';
-                var summary = item.summary_brief || '';
+                var iconClass = item.type === 'sales_call' ? 'sales' : (item.type === 'meeting' ? 'meeting' : (item.type === 'contract' ? 'contract' : 'interview'));
+                var icon = item.type === 'sales_call' ? '📞' : (item.type === 'meeting' ? '📋' : (item.type === 'contract' ? '📄' : '📝'));
+                var typeName = item.type === 'sales_call' ? '销售通话' : (item.type === 'meeting' ? '会议记录' : (item.type === 'contract' ? '合同协议' : '访谈调研'));
+                var intent = item.analysis ? item.analysis.intent : 'medium';
+                var intentText = intent === 'high' ? '高意向' : (intent === 'medium' ? '中意向' : '低意向');
+                var intentClass = 'score-' + intent;
 
                 html += '<div class="history-card" style="animation:fadeIn 0.3s ease ' + (index * 0.05) + 's both">';
-                html += '  <div class="history-icon">' + icon + '</div>';
-                html += '  <div class="history-info" onclick="viewDetail(' + index + ')">';
+                html += '  <div class="history-icon ' + iconClass + '">' + icon + '</div>';
+                html += '  <div class="history-info" onclick="viewDetail(' + allHistory.indexOf(item) + ')">';
                 html += '    <div class="history-title">' + (item.title || '未命名分析') + '</div>';
-                if (summary) {
-                    html += '    <div style="font-size:var(--text-xs);color:var(--text-secondary);margin:4px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + summary + '</div>';
-                }
+                html += '    <div class="history-summary">' + (item.summary_brief || '无摘要') + '</div>';
                 html += '    <div class="history-meta">';
                 html += '      <span class="history-type">' + typeName + '</span>';
-                html += '      <span class="history-time">' + formatTime(item.created_at) + '</span>';
+                html += '      <span class="history-time">🕐 ' + formatTime(item.created_at) + '</span>';
                 html += '    </div>';
                 html += '  </div>';
-                html += '  <div class="history-intent">';
-                html += '    <span class="intent-tag ' + intentClass + '">' + intentText + '</span>';
+                html += '  <div class="history-score">';
+                html += '    <span class="score-badge ' + intentClass + '">' + intentText + '</span>';
                 html += '  </div>';
                 html += '  <div class="history-actions">';
-                html += '    <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteRecord(' + index + ')" title="删除">🗑️</button>';
+                html += '    <button class="action-btn" onclick="event.stopPropagation();copyRecord(' + allHistory.indexOf(item) + ')" title="复制">📋</button>';
+                html += '    <button class="action-btn danger" onclick="event.stopPropagation();deleteRecord(' + allHistory.indexOf(item) + ')" title="删除">🗑️</button>';
                 html += '  </div>';
                 html += '</div>';
             });
 
             listEl.innerHTML = html;
-        }
-
-        // 筛选历史记录
-        function filterHistory() {
-            var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-            if (!keyword) {
-                renderHistory(allHistory);
-                return;
-            }
-
-            var filtered = allHistory.filter(function(item) {
-                return (item.title && item.title.toLowerCase().includes(keyword)) ||
-                       (item.content && item.content.toLowerCase().includes(keyword));
-            });
-
-            renderHistory(filtered);
         }
 
         // 格式化时间
@@ -280,76 +339,35 @@
             if (!item) return;
 
             var analysis = item.analysis || {};
-            var intentText = analysis.intent === 'high' ? '高意向' : (analysis.intent === 'medium' ? '中意向' : '低意向');
+            var intent = analysis.intent || 'medium';
+            var intentText = intent === 'high' ? '高意向' : (intent === 'medium' ? '中意向' : '低意向');
 
             var html = '';
-
-            // 意向度
-            html += '<div style="text-align:center;margin-bottom:24px">';
-            html += '  <span class="intent-tag intent-' + (analysis.intent || 'medium') + '" style="font-size:var(--text-lg);padding:12px 24px">' + intentText + '</span>';
+            html += '<div style="text-align:center;margin-bottom:24px"><span class="score-badge score-' + intent + '" style="font-size:16px;padding:10px 24px">' + intentText + '</span></div>';
+            html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;justify-content:center">';
+            html += '<span class="detail-tag">📅 ' + formatTime(item.created_at) + '</span>';
+            html += '<span class="detail-tag">📂 ' + (item.type === 'sales_call' ? '销售通话' : (item.type === 'meeting' ? '会议记录' : (item.type === 'contract' ? '合同协议' : '访谈调研'))) + '</span>';
             html += '</div>';
 
-            // 关键需求
+            if (item.summary_brief) {
+                html += '<div class="detail-section"><h4 class="detail-section-title">📊 核心摘要</h4><div class="detail-text">' + item.summary_brief + '</div></div>';
+            }
+
             if (analysis.key_needs && analysis.key_needs.length > 0) {
-                html += '<div class="detail-section">';
-                html += '  <h4 class="detail-section-title">🎯 关键需求</h4>';
-                html += '  <ul class="detail-list">';
-                analysis.key_needs.forEach(function(need) {
-                    html += '<li>' + need + '</li>';
-                });
-                html += '  </ul>';
-                html += '</div>';
+                html += '<div class="detail-section"><h4 class="detail-section-title">🎯 关键需求</h4><div class="detail-tags">';
+                analysis.key_needs.forEach(function(need) { html += '<span class="detail-tag">' + need + '</span>'; });
+                html += '</div></div>';
             }
 
-            // 客户痛点
-            if (analysis.pain_points && analysis.pain_points.length > 0) {
-                html += '<div class="detail-section">';
-                html += '  <h4 class="detail-section-title">😤 客户痛点</h4>';
-                html += '  <ul class="detail-list">';
-                analysis.pain_points.forEach(function(point) {
-                    html += '<li>' + point + '</li>';
-                });
-                html += '  </ul>';
-                html += '</div>';
-            }
-
-            // 情绪变化
-            if (analysis.emotion_trend) {
-                html += '<div class="detail-section">';
-                html += '  <h4 class="detail-section-title">😊 情绪变化</h4>';
-                html += '  <div class="detail-text">' + analysis.emotion_trend + '</div>';
-                html += '</div>';
-            }
-
-            // 行动建议
             if (analysis.action_suggestions && analysis.action_suggestions.length > 0) {
-                html += '<div class="detail-section">';
-                html += '  <h4 class="detail-section-title">💡 行动建议</h4>';
-                html += '  <ul class="detail-list">';
-                analysis.action_suggestions.forEach(function(suggestion) {
-                    html += '<li>' + suggestion + '</li>';
-                });
-                html += '  </ul>';
-                html += '</div>';
+                html += '<div class="detail-section"><h4 class="detail-section-title">💡 行动建议</h4><div class="detail-text">';
+                analysis.action_suggestions.forEach(function(s) { html += '• ' + s + '\n'; });
+                html += '</div></div>';
             }
 
-            // 风险预警
-            if (analysis.risks && analysis.risks.length > 0) {
-                html += '<div class="detail-section">';
-                html += '  <h4 class="detail-section-title">⚠️ 风险预警</h4>';
-                html += '  <ul class="detail-list">';
-                analysis.risks.forEach(function(risk) {
-                    html += '<li>' + risk + '</li>';
-                });
-                html += '  </ul>';
-                html += '</div>';
+            if (item.content) {
+                html += '<div class="detail-section"><h4 class="detail-section-title">📝 原始内容</h4><div class="detail-original">' + item.content + '</div></div>';
             }
-
-            // 原始内容
-            html += '<div class="detail-section">';
-            html += '  <h4 class="detail-section-title">📝 原始内容</h4>';
-            html += '  <div class="detail-original">' + (item.content || '无内容') + '</div>';
-            html += '</div>';
 
             document.getElementById('detailTitle').textContent = item.title || '分析详情';
             document.getElementById('detailBody').innerHTML = html;
@@ -361,25 +379,23 @@
             document.getElementById('detailModal').classList.remove('active');
         }
 
+        // 复制记录
+        function copyRecord(index) {
+            var item = allHistory[index];
+            if (!item) return;
+            var text = '【' + item.title + '】\n\n核心摘要：' + (item.summary_brief || '无') + '\n\n意向度：' + (item.analysis ? item.analysis.intent : '未知');
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('已复制到剪贴板', 'success');
+            });
+        }
+
         // 删除记录
         function deleteRecord(index) {
             if (!confirm('确定要删除这条分析记录吗？')) return;
-
-            var item = allHistory[index];
-            if (window.api && item.id) {
-                window.api.deleteAnalysis(item.id).then(function() {
-                    allHistory.splice(index, 1);
-                    renderHistory(allHistory);
-                    showToast('已删除', 'success');
-                }).catch(function() {
-                    showToast('删除失败', 'error');
-                });
-            } else {
-                allHistory.splice(index, 1);
-                localStorage.setItem('analysis_history', JSON.stringify(allHistory));
-                renderHistory(allHistory);
-                showToast('已删除', 'success');
-            }
+            allHistory.splice(index, 1);
+            updateStats();
+            filterHistory();
+            showToast('已删除', 'success');
         }
 
         // Toast提示
@@ -390,6 +406,11 @@
                 alert(message);
             }
         }
+
+        // 点击弹窗外部关闭
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailModal();
+        });
 
         // 初始化
         loadHistory();

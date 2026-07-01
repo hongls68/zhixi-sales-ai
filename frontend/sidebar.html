@@ -51,4 +51,39 @@
             <div class="sidebar-user">
                 <div class="user-avatar-sm" id="sidebarAvatar">U</div>
                 <div class="user-info-sm">
-                    <div class="user-name-sm" id="sid
+                    <div class="user-name-sm" id="sidebarName">用户</div>
+                    <div class="user-role-sm" id="sidebarRole">免费版</div>
+                </div>
+            </div>
+        </aside>
+
+        <script>
+        // 高亮当前页面菜单
+        (function() {
+            var currentPath = window.location.pathname;
+            var filename = currentPath.split('/').pop() || 'dashboard.html';
+            var currentPage = filename.replace('.html', '');
+
+            // 移除所有active
+            document.querySelectorAll('.nav-item').forEach(function(item) {
+                item.classList.remove('active');
+            });
+
+            // 添加active到当前页面
+            var activeItem = document.querySelector('[data-page="' + currentPage + '"]');
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            // 显示管理员菜单（如果需要）
+            if (window.auth && window.auth.isLoggedIn()) {
+                var user = window.auth.getUserInfo();
+                if (user.role === 'admin' || user.phone === 'admin') {
+                    var adminNav = document.getElementById('adminNav');
+                    if (adminNav) {
+                        adminNav.classList.add('show');
+                    }
+                }
+            }
+        })();
+        </script>
