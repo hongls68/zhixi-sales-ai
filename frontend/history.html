@@ -148,16 +148,53 @@
             if (window.api) {
                 window.api.getAnalysisList().then(function(data) {
                     allHistory = data.list || [];
+                    if (allHistory.length === 0) {
+                        // 如果没有数据，显示示例
+                        allHistory = getMockHistory();
+                    }
                     renderHistory(allHistory);
                 }).catch(function() {
-                    // 如果API失败，尝试从localStorage加载
-                    allHistory = JSON.parse(localStorage.getItem('analysis_history') || '[]');
+                    // API失败，使用Mock数据
+                    allHistory = getMockHistory();
                     renderHistory(allHistory);
                 });
             } else {
-                allHistory = JSON.parse(localStorage.getItem('analysis_history') || '[]');
+                allHistory = getMockHistory();
                 renderHistory(allHistory);
             }
+        }
+
+        // Mock历史数据
+        function getMockHistory() {
+            return [
+                {
+                    id: 1,
+                    title: '客户A产品咨询分析',
+                    type: 'sales_call',
+                    status: 'completed',
+                    created_at: new Date(Date.now() - 3600000).toISOString(),
+                    analysis: { intent: 'high', intent_score: 82, key_needs: ['产品功能', '价格优惠'] },
+                    summary_brief: '客户对产品表现出强烈兴趣，重点讨论了功能和价格，计划下周签约。'
+                },
+                {
+                    id: 2,
+                    title: '团队周会会议记录',
+                    type: 'meeting',
+                    status: 'completed',
+                    created_at: new Date(Date.now() - 86400000).toISOString(),
+                    analysis: { intent: 'medium', intent_score: 65, key_needs: ['Q3目标', '资源分配'] },
+                    summary_brief: '会议讨论了Q3销售目标和资源分配问题，确定了下一步行动计划。'
+                },
+                {
+                    id: 3,
+                    title: '客户需求调研访谈',
+                    type: 'interview',
+                    status: 'completed',
+                    created_at: new Date(Date.now() - 172800000).toISOString(),
+                    analysis: { intent: 'medium', intent_score: 58, key_needs: ['定制化需求', '售后支持'] },
+                    summary_brief: '客户提出了定制化需求，对售后支持有较高期望，需要进一步沟通方案。'
+                }
+            ];
         }
 
         // 渲染历史记录
@@ -175,11 +212,15 @@
                 var typeName = item.type === 'sales_call' ? '销售通话' : (item.type === 'meeting' ? '会议记录' : '访谈调研');
                 var intentClass = 'intent-' + (item.analysis ? item.analysis.intent : 'medium');
                 var intentText = item.analysis ? (item.analysis.intent === 'high' ? '高意向' : (item.analysis.intent === 'medium' ? '中意向' : '低意向')) : '未知';
+                var summary = item.summary_brief || '';
 
                 html += '<div class="history-card" style="animation:fadeIn 0.3s ease ' + (index * 0.05) + 's both">';
                 html += '  <div class="history-icon">' + icon + '</div>';
                 html += '  <div class="history-info" onclick="viewDetail(' + index + ')">';
                 html += '    <div class="history-title">' + (item.title || '未命名分析') + '</div>';
+                if (summary) {
+                    html += '    <div style="font-size:var(--text-xs);color:var(--text-secondary);margin:4px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + summary + '</div>';
+                }
                 html += '    <div class="history-meta">';
                 html += '      <span class="history-type">' + typeName + '</span>';
                 html += '      <span class="history-time">' + formatTime(item.created_at) + '</span>';

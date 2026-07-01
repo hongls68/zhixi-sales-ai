@@ -227,7 +227,14 @@
           })
         });
       }
-      // Mock
+      // 智能Mock - 基于内容分析
+      var highIntentWords = ["购买", "成交", "签约", "两件一起", "要了", "买了", "带走", "拿", "好的", "行", "谢谢", "太感谢"];
+      var lowIntentWords = ["考虑", "商量", "看看", "再说", "不需要", "不要", "暂时", "随便"];
+      var highCount = highIntentWords.filter(function(w) { return content.indexOf(w) !== -1; }).length;
+      var lowCount = lowIntentWords.filter(function(w) { return content.indexOf(w) !== -1; }).length;
+      var intent = highCount > lowCount ? "high" : (lowCount > highCount ? "low" : "medium");
+      var score = intent === "high" ? 85 : (intent === "low" ? 35 : 60);
+
       return new Promise(function(resolve) {
         setTimeout(function() {
           resolve({
@@ -236,14 +243,53 @@
             content: content,
             type: type || 'sales_call',
             status: 'completed',
-            analysis: {
-              intent_score: 78,
-              sentiment: 'positive',
-              key_points: ['客户对产品感兴趣', '价格是主要考虑'],
-              risks: ['可能对比竞品'],
-              suggestions: ['及时跟进', '发送方案'],
-              keywords: ['价格', '方案']
-            }
+            created_at: new Date().toISOString(),
+            lead_score: score,
+            closing_probability: Math.max(0, score - 5),
+            score_reason: intent === "high" ? "客户表现出明确的购买意向" : (intent === "low" ? "客户意向度较低" : "客户表现出一定兴趣但有顾虑"),
+            summary_brief: '这是一段销售对话分析，客户意向度为' + (intent === "high" ? "高" : (intent === "low" ? "低" : "中")) + '。',
+            summary_detail: '客户在对话中表现出一定的兴趣。',
+            intent: intent,
+            intent_score: score,
+            customer_profile: {
+              types: [intent === "high" ? "高意向客户" : "潜在客户"],
+              characteristics: ["关注性价比"]
+            },
+            key_needs: [
+              {"text": "产品功能", "importance": 4},
+              {"text": "价格优惠", "importance": 5}
+            ],
+            pain_points: [
+              {"issue": "价格顾虑", "explanation": "担心超出预算"}
+            ],
+            emotion_timeline: [
+              {"stage": "开始", "emoji": "🙂", "mood": "平静", "description": "客户态度平和"},
+              {"stage": "结束", "emoji": intent === "high" ? "😄" : "😐", "mood": intent === "high" ? "满意" : "观望", "description": "对话结束"}
+            ],
+            emotion_trend: "客户态度中立",
+            sales_performance: {
+              "need_digging": score + 5,
+              "product_intro": score - 5,
+              "value_building": score,
+              "objection_handling": score,
+              "pricing_strategy": score - 8,
+              "closing_push": score + 10,
+              "professionalism": score + 2,
+              "communication": score + 5,
+              "overall_score": score + 2
+            },
+            sales_highlights: [
+              {"point": "保持专业态度", "explanation": "在对话中展现了专业素养"}
+            ],
+            risk_warnings: intent === "medium" ? [
+              {"risk": "客户可能还在考虑", "level": "medium", "suggestion": "保持跟进"}
+            ] : [],
+            action_suggestions: [
+              {"action": "发送详细资料", "priority": "high"},
+              {"action": "设置跟进提醒", "priority": "medium"}
+            ],
+            ai_tags: ["#" + intent, "#待跟进"],
+            analysis: {}
           });
         }, 1500);
       });

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新建分析 - 智析销售AI</title>
     <link rel="stylesheet" href="static/css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
       .app-layout{display:flex;min-height:100vh;background:var(--bg-secondary)}
       .sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-color);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
@@ -176,75 +178,142 @@
                 <!-- 分析结果区域 -->
                 <div class="result-section" id="resultSection">
                     <div class="result-header">
-                        <h2 class="result-title">📊 分析结果</h2>
+                        <h2 class="result-title">专业分析报告</h2>
                         <div class="result-actions">
-                            <button class="btn btn-secondary" onclick="copyResult()">📋 复制结果</button>
-                            <button class="btn btn-primary" onclick="saveToHistory()">💾 保存到记录</button>
+                            <button class="btn btn-secondary" onclick="copyResult()">复制结果</button>
+                            <button class="btn btn-primary" onclick="saveToHistory()">保存记录</button>
                         </div>
                     </div>
 
-                    <!-- 意向度 -->
-                    <div style="margin-bottom:24px;text-align:center">
-                        <span class="intent-badge" id="intentBadge">高意向</span>
+                    <!-- Lead Score 卡片 -->
+                    <div class="lead-score-card" id="leadScoreCard">
+                        <div class="lead-score-header">
+                            <div>
+                                <div class="lead-score-title">客户意向度评分</div>
+                                <div id="intentBadge" class="intent-badge" style="margin-top:8px">高意向</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div class="lead-score-value" id="leadScoreValue">85</div>
+                                <div class="lead-score-label">Lead Score</div>
+                            </div>
+                        </div>
+                        <div class="lead-score-bar">
+                            <div class="lead-score-bar-fill" id="leadScoreBar" style="width:85%"></div>
+                        </div>
+                        <div class="closing-prob">
+                            <span class="closing-prob-label">成交概率</span>
+                            <span class="closing-prob-value" id="closingProb">80%</span>
+                        </div>
+                        <div class="score-reason" id="scoreReason"></div>
                     </div>
 
-                    <!-- 分析卡片 -->
+                    <!-- 一句话总结 -->
+                    <div style="background:linear-gradient(135deg, #F0FDF4, #DCFCE7);padding:20px;border-radius:12px;margin-bottom:24px;border-left:4px solid #22C55E">
+                        <div style="font-size:var(--text-sm);color:#166534;font-weight:600;margin-bottom:8px">核心结论</div>
+                        <div id="summaryBrief" style="font-size:var(--text-lg);color:var(--text-primary);line-height:1.6;font-weight:500"></div>
+                    </div>
+
+                    <!-- AI标签 -->
+                    <div style="margin-bottom:24px">
+                        <div class="ai-tags" id="aiTags"></div>
+                    </div>
+
+                    <!-- 分析卡片网格 -->
                     <div class="analysis-cards">
+
+                        <!-- 客户画像 -->
+                        <div class="analysis-card">
+                            <div class="card-header">
+                                <div class="card-icon blue">👤</div>
+                                <h3 class="card-title">客户画像</h3>
+                            </div>
+                            <div class="customer-profile" id="customerProfile">
+                                <div class="profile-section">
+                                    <div class="profile-label">客户类型</div>
+                                    <div class="tag-cloud" id="customerTypes"></div>
+                                </div>
+                                <div class="profile-section">
+                                    <div class="profile-label">消费特点</div>
+                                    <div class="tag-cloud" id="customerChars"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 关键需求 -->
                         <div class="analysis-card">
                             <div class="card-header">
-                                <div class="card-icon blue">🎯</div>
+                                <div class="card-icon orange">🎯</div>
                                 <h3 class="card-title">关键需求</h3>
                             </div>
-                            <div class="card-content" id="keyNeeds">
-                                <ul>
-                                    <li>...</li>
-                                </ul>
-                            </div>
+                            <div id="keyNeeds"></div>
                         </div>
 
                         <!-- 客户痛点 -->
                         <div class="analysis-card">
                             <div class="card-header">
-                                <div class="card-icon orange">😤</div>
+                                <div class="card-icon red">😤</div>
                                 <h3 class="card-title">客户痛点</h3>
                             </div>
-                            <div class="card-content" id="painPoints">
-                                <ul>
-                                    <li>...</li>
-                                </ul>
-                            </div>
+                            <div id="painPoints"></div>
                         </div>
 
-                        <!-- 情绪变化 -->
+                        <!-- 情绪变化时间线 -->
                         <div class="analysis-card full-width">
                             <div class="card-header">
                                 <div class="card-icon green">😊</div>
                                 <h3 class="card-title">情绪变化</h3>
                             </div>
-                            <div class="card-content" id="emotionTrend">...</div>
+                            <div class="emotion-timeline" id="emotionTimeline"></div>
+                        </div>
+
+                        <!-- 销售表现评分 -->
+                        <div class="analysis-card full-width">
+                            <div class="card-header">
+                                <div class="card-icon blue">📊</div>
+                                <h3 class="card-title">销售表现评估</h3>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start" id="salesPerformanceSection">
+                                <div class="performance-grid" id="performanceGrid"></div>
+                                <div class="radar-chart-container">
+                                    <canvas id="radarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 销售亮点 -->
+                        <div class="analysis-card full-width">
+                            <div class="card-header">
+                                <div class="card-icon green">✨</div>
+                                <h3 class="card-title">销售亮点</h3>
+                            </div>
+                            <div id="salesHighlights"></div>
+                        </div>
+
+                        <!-- 风险预警 -->
+                        <div class="analysis-card full-width">
+                            <div class="card-header">
+                                <div class="card-icon red">⚠️</div>
+                                <h3 class="card-title">风险预警</h3>
+                            </div>
+                            <div id="riskWarnings"></div>
                         </div>
 
                         <!-- 行动建议 -->
                         <div class="analysis-card full-width">
                             <div class="card-header">
-                                <div class="card-icon green">💡</div>
-                                <h3 class="card-title">下一步行动建议</h3>
+                                <div class="card-icon blue">💡</div>
+                                <h3 class="card-title">行动建议</h3>
                             </div>
-                            <div class="card-content" id="actionSuggestions">
-                                <ul>
-                                    <li>...</li>
-                                </ul>
-                            </div>
+                            <div id="actionSuggestions"></div>
                         </div>
 
-                        <!-- 风险预警 -->
-                        <div class="analysis-card full-width" id="riskCard" style="display:none">
+                        <!-- 详细总结 -->
+                        <div class="analysis-card full-width">
                             <div class="card-header">
-                                <div class="card-icon red">⚠️</div>
-                                <h3 class="card-title">风险预警</h3>
+                                <div class="card-icon blue">📝</div>
+                                <h3 class="card-title">详细分析</h3>
                             </div>
-                            <div class="card-content" id="riskWarnings"></div>
+                            <div class="card-content" id="summaryDetail" style="white-space:pre-wrap;line-height:1.8;color:var(--text-secondary)"></div>
                         </div>
                     </div>
                 </div>
@@ -337,10 +406,176 @@
             }
         }
 
-        // 生成Mock结果
+        // 生成基于内容的智能Mock结果 - 专业版
         function generateMockResult(content) {
-            var intents = ['high', 'medium', 'low'];
-            var intent = intents[Math.floor(Math.random() * 3)];
+            // 分析意向度
+            var highIntentWords = ["购买", "成交", "签约", "两件一起", "要了", "买了", "带走", "拿", "好的", "行", "谢谢", "太感谢"];
+            var lowIntentWords = ["考虑", "商量", "看看", "再说", "不需要", "不要", "暂时", "随便"];
+
+            var highCount = 0, lowCount = 0;
+            highIntentWords.forEach(function(w) { if (content.indexOf(w) !== -1) highCount++; });
+            lowIntentWords.forEach(function(w) { if (content.indexOf(w) !== -1) lowCount++; });
+
+            var intent = "medium";
+            var score = 60;
+            if (highCount > lowCount) {
+                intent = "high";
+                score = Math.min(95, 60 + highCount * 8);
+            } else if (lowCount > highCount) {
+                intent = "low";
+                score = Math.max(25, 60 - lowCount * 12);
+            }
+
+            var closingProb = Math.max(0, score - 5);
+
+            // 客户画像
+            var customerTypes = [];
+            var customerChars = [];
+            var keyNeeds = [];
+            var painPoints = [];
+
+            if (content.indexOf("价格") !== -1 || content.indexOf("贵") !== -1 || content.indexOf("优惠") !== -1 || content.indexOf("打折") !== -1) {
+                customerTypes.push("价格敏感型");
+                customerChars.push("关注性价比");
+                keyNeeds.push({"text": "价格优惠", "importance": 5});
+                painPoints.push({"issue": "价格顾虑", "explanation": "客户对价格存在顾虑，担心超出预算"});
+            }
+            if (content.indexOf("面料") !== -1 || content.indexOf("材质") !== -1 || content.indexOf("质量") !== -1) {
+                customerChars.push("关注品质");
+                keyNeeds.push({"text": "产品质量", "importance": 4});
+            }
+            if (content.indexOf("颜色") !== -1 || content.indexOf("款式") !== -1 || content.indexOf("版型") !== -1) {
+                customerTypes.push("注重外观");
+                keyNeeds.push({"text": "外观款式", "importance": 3});
+            }
+            if (content.indexOf("试") !== -1 || content.indexOf("合身") !== -1 || content.indexOf("尺码") !== -1) {
+                customerChars.push("注重穿着体验");
+                keyNeeds.push({"text": "合身舒适", "importance": 4});
+            }
+            if (content.indexOf("服务") !== -1 || content.indexOf("售后") !== -1 || content.indexOf("会员") !== -1) {
+                customerChars.push("关注服务");
+                keyNeeds.push({"text": "售后服务", "importance": 3});
+            }
+            if (intent === "high") customerTypes.push("高意向客户");
+            if (!customerTypes.length) customerTypes.push("潜在客户");
+            if (!customerChars.length) customerChars.push("需求待明确");
+
+            // 情绪时间线
+            var emotionTimeline;
+            if (intent === "high") {
+                emotionTimeline = [
+                    {"stage": "进店", "emoji": "🙂", "mood": "平静", "description": "客户态度平和，浏览商品"},
+                    {"stage": "需求确认", "emoji": "😊", "mood": "感兴趣", "description": "确认了穿着偏好和款式需求"},
+                    {"stage": "议价", "emoji": "😐", "mood": "谨慎", "description": "对价格表示关注"},
+                    {"stage": "决策", "emoji": "😄", "mood": "满意", "description": "接受了优惠方案"}
+                ];
+            } else if (intent === "medium") {
+                emotionTimeline = [
+                    {"stage": "进店", "emoji": "🙂", "mood": "平静", "description": "客户态度中立"},
+                    {"stage": "了解", "emoji": "🤔", "mood": "观望", "description": "了解产品信息"},
+                    {"stage": "离开", "emoji": "😐", "mood": "犹豫", "description": "表示需要考虑"}
+                ];
+            } else {
+                emotionTimeline = [
+                    {"stage": "进店", "emoji": "😐", "mood": "冷淡", "description": "客户只是随便看看"},
+                    {"stage": "离开", "emoji": "🙂", "mood": "平和", "description": "礼貌离开"}
+                ];
+            }
+
+            // 销售表现
+            var baseScore = score;
+            var salesPerf = {
+                "need_digging": Math.min(100, baseScore + 5),
+                "product_intro": Math.min(100, baseScore - 5),
+                "value_building": Math.min(100, baseScore),
+                "objection_handling": Math.min(100, baseScore + 3),
+                "pricing_strategy": Math.min(100, baseScore - 8),
+                "closing_push": Math.min(100, baseScore + 10),
+                "professionalism": Math.min(100, baseScore + 2),
+                "communication": Math.min(100, baseScore + 5),
+                "overall_score": Math.min(100, baseScore + 2)
+            };
+
+            // 销售亮点
+            var salesHighlights = [];
+            if (content.indexOf("好的") !== -1 || content.indexOf("行") !== -1) {
+                salesHighlights.push({"point": "成功引导客户接受方案", "explanation": "通过有效沟通，客户接受了销售推荐"});
+            }
+            if (content.indexOf("面料") !== -1 || content.indexOf("材质") !== -1) {
+                salesHighlights.push({"point": "充分展示产品特点", "explanation": "详细介绍了面料和材质优势"});
+            }
+            if (content.indexOf("打折") !== -1 || content.indexOf("优惠") !== -1) {
+                salesHighlights.push({"point": "灵活运用促销策略", "explanation": "成功运用促销活动促成交易"});
+            }
+            if (!salesHighlights.length) {
+                salesHighlights.push({"point": "保持专业服务态度", "explanation": "在有限信息下保持了良好的服务态度"});
+            }
+
+            // 风险预警
+            var riskWarnings = [];
+            if (intent === "medium") {
+                riskWarnings.push({"risk": "客户可能还在考虑其他选择", "level": "medium", "suggestion": "保持适度跟进"});
+            }
+            if (intent === "low") {
+                riskWarnings.push({"risk": "客户意向度较低", "level": "high", "suggestion": "不要过于急切，等待客户主动"});
+            }
+            if (content.indexOf("定金") === -1 && content.indexOf("付") === -1 && content.indexOf("买") === -1) {
+                riskWarnings.push({"risk": "尚未完成付款", "level": "low", "suggestion": "推进成交环节"});
+            }
+
+            // 行动建议
+            var actionSuggestions;
+            if (intent === "high") {
+                actionSuggestions = [
+                    {"action": "引导客户完成购买付款", "priority": "high"},
+                    {"action": "添加客户微信以便后续服务", "priority": "high"},
+                    {"action": "告知会员积分和售后政策", "priority": "medium"}
+                ];
+            } else if (intent === "medium") {
+                actionSuggestions = [
+                    {"action": "发送详细产品资料", "priority": "high"},
+                    {"action": "发送优惠活动信息", "priority": "medium"},
+                    {"action": "设置3天后跟进提醒", "priority": "medium"}
+                ];
+            } else {
+                actionSuggestions = [
+                    {"action": "保持友好印象", "priority": "high"},
+                    {"action": "不频繁打扰，等待客户主动询问", "priority": "medium"},
+                    {"action": "定期发送新品信息", "priority": "low"}
+                ];
+            }
+
+            // AI标签
+            var aiTags = ["#" + (intent === "high" ? "高意向" : (intent === "low" ? "低意向" : "中意向"))];
+            if (content.indexOf("价格") !== -1 || content.indexOf("贵") !== -1) aiTags.push("#价格敏感");
+            if (content.indexOf("面料") !== -1 || content.indexOf("质量") !== -1) aiTags.push("#品质关注");
+            if (intent === "high") aiTags.push("#成交机会");
+            else aiTags.push("#需持续跟进");
+
+            // 总结
+            var intentText = intent === "high" ? "高" : (intent === "low" ? "低" : "中");
+            var summaryBrief;
+            if (intent === "high") {
+                summaryBrief = "这是一段销售对话分析，客户意向度为高，成功达成购买意向。";
+            } else if (intent === "medium") {
+                summaryBrief = "这是一段销售对话分析，客户意向度为中，表现出一定兴趣但有顾虑，需要进一步跟进培养。";
+            } else {
+                summaryBrief = "这是一段销售对话分析，客户意向度为低，主要处于了解阶段，暂无明确购买意向。";
+            }
+
+            var summaryDetail;
+            if (intent === "high") {
+                summaryDetail = "客户在对话中表现出明确的购买意向。对话显示客户关注产品的性价比和质量，对销售推荐的产品比较满意。在价格讨论后接受了优惠方案，建议抓住时机促成交易完成。";
+            } else if (intent === "medium") {
+                summaryDetail = "客户在对话中表现出一定的兴趣，但可能还在犹豫或考虑中。主要关注产品的价格和品质。建议后续保持适度跟进，提供更多产品信息或优惠方案。";
+            } else {
+                summaryDetail = "客户在对话中态度比较谨慎，可能只是随便看看或有其他顾虑。建议不要过于急切，可以简单介绍产品特点，留下好印象，等待客户主动询问。";
+            }
+
+            var scoreReason;
+            if (intent === "high") scoreReason = "客户表现出明确的购买意向，积极参与议价并接受了优惠方案。";
+            else if (intent === "medium") scoreReason = "客户表现出一定兴趣但存在顾虑，需要进一步沟通和培养。";
+            else scoreReason = "客户意向度较低，主要处于了解阶段，暂无明确购买计划。";
 
             return {
                 id: Date.now(),
@@ -348,85 +583,275 @@
                 type: selectedType,
                 content: content,
                 created_at: new Date().toISOString(),
-                analysis: {
-                    intent: intent,
-                    intent_score: intent === 'high' ? 85 : (intent === 'medium' ? 60 : 35),
-                    key_needs: [
-                        '对产品核心功能感兴趣',
-                        '关注性价比',
-                        '需要了解售后服务'
-                    ],
-                    pain_points: [
-                        '预算有限，需要控制成本',
-                        '担心理实施周期过长',
-                        '对数据安全性有顾虑'
-                    ],
-                    emotion_trend: '客户整体情绪积极，从最初的怀疑逐渐转变为认可，最后表达出明确的购买意向。在讨论价格时略有犹豫，但在了解优惠政策后情绪回升。',
-                    action_suggestions: [
-                        '3天内发送详细报价方案',
-                        '安排产品演示，重点展示核心功能',
-                        '准备竞品对比资料',
-                        '设置7天后跟进提醒'
-                    ],
-                    risks: intent === 'low' ? ['客户可能在对比其他竞品', '决策周期可能较长'] : []
-                }
+                lead_score: score,
+                closing_probability: closingProb,
+                score_reason: scoreReason,
+                summary_brief: summaryBrief,
+                summary_detail: summaryDetail,
+                intent: intent,
+                intent_score: score,
+                customer_profile: {
+                    types: customerTypes.slice(0, 3),
+                    characteristics: customerChars.slice(0, 4)
+                },
+                key_needs: keyNeeds.slice(0, 5).length ? keyNeeds.slice(0, 5) : [{"text": "了解产品信息", "importance": 3}],
+                pain_points: painPoints.slice(0, 3),
+                emotion_timeline: emotionTimeline,
+                emotion_trend: emotionTimeline[emotionTimeline.length - 1].mood,
+                sales_performance: salesPerf,
+                sales_highlights: salesHighlights.slice(0, 4),
+                risk_warnings: riskWarnings.slice(0, 3),
+                action_suggestions: actionSuggestions.slice(0, 5),
+                ai_tags: aiTags,
+                analysis: {}
             };
         }
 
-        // 显示分析结果
+        // 显示分析结果 - 专业版
         function displayResult(result) {
             currentResult = result;
-            var analysis = result.analysis;
+            // 兼容新旧格式：优先使用顶层数据，其次使用 analysis 字段
+            var data = (result.analysis && Object.keys(result.analysis).length > 0) ? result.analysis : result;
 
-            // 意向度
+            // Lead Score
+            var leadScore = data.lead_score || data.intent_score || 50;
+            var closingProb = data.closing_probability || (leadScore - 5);
+            var intent = data.intent || (leadScore >= 70 ? "high" : (leadScore >= 40 ? "medium" : "low"));
+
+            document.getElementById('leadScoreValue').textContent = Math.round(leadScore);
+            document.getElementById('leadScoreBar').style.width = leadScore + '%';
+            document.getElementById('closingProb').textContent = Math.round(closingProb) + '%';
+
+            var scoreReason = data.score_reason || "";
+            document.getElementById('scoreReason').textContent = scoreReason;
+
+            // 意向度标签
             var intentBadge = document.getElementById('intentBadge');
-            var intentText = analysis.intent === 'high' ? '高意向' : (analysis.intent === 'medium' ? '中意向' : '低意向');
+            var intentText = intent === 'high' ? '高意向' : (intent === 'medium' ? '中意向' : '低意向');
             intentBadge.textContent = intentText;
-            intentBadge.className = 'intent-badge intent-' + analysis.intent;
+            intentBadge.className = 'intent-badge intent-' + intent;
+
+            // 一句话总结
+            document.getElementById('summaryBrief').textContent = result.summary_brief || data.summary_brief || '对话分析完成';
+
+            // 详细总结
+            document.getElementById('summaryDetail').innerHTML = (result.summary_detail || data.summary_detail || '暂无详细总结').replace(/\n/g, '<br>');
+
+            // AI标签
+            var aiTags = data.ai_tags || data.keywords || [];
+            var tagsHtml = '';
+            aiTags.forEach(function(tag) {
+                tagsHtml += '<span class="ai-tag">' + tag + '</span>';
+            });
+            document.getElementById('aiTags').innerHTML = tagsHtml;
+
+            // 客户画像
+            var profile = data.customer_profile || {};
+            var types = profile.types || [];
+            var chars = profile.characteristics || [];
+
+            var typesHtml = '';
+            types.forEach(function(t) { typesHtml += '<span class="tag primary">' + t + '</span>'; });
+            if (!typesHtml) typesHtml = '<span class="tag">潜在客户</span>';
+            document.getElementById('customerTypes').innerHTML = typesHtml;
+
+            var charsHtml = '';
+            chars.forEach(function(c) { charsHtml += '<span class="tag">' + c + '</span>'; });
+            if (!charsHtml) charsHtml = '<span class="tag">需求待明确</span>';
+            document.getElementById('customerChars').innerHTML = charsHtml;
 
             // 关键需求
-            var keyNeedsHtml = '<ul>';
-            analysis.key_needs.forEach(function(need) {
-                keyNeedsHtml += '<li>' + need + '</li>';
-            });
-            keyNeedsHtml += '</ul>';
-            document.getElementById('keyNeeds').innerHTML = keyNeedsHtml;
+            var keyNeeds = data.key_needs || [];
+            var needsHtml = '';
+            if (keyNeeds.length > 0) {
+                keyNeeds.forEach(function(need) {
+                    var text = typeof need === 'object' ? need.text : need;
+                    var importance = typeof need === 'object' ? (need.importance || 3) : 3;
+                    var stars = '';
+                    for (var i = 0; i < 5; i++) {
+                        stars += '<span class="star' + (i < importance ? '' : ' empty') + '">★</span>';
+                    }
+                    needsHtml += '<div class="need-item"><div class="importance">' + stars + '</div><span class="need-text">' + text + '</span></div>';
+                });
+            } else {
+                needsHtml = '<div class="need-item"><span class="need-text" style="color:var(--text-secondary)">暂无明确需求</span></div>';
+            }
+            document.getElementById('keyNeeds').innerHTML = needsHtml;
 
             // 客户痛点
-            var painPointsHtml = '<ul>';
-            analysis.pain_points.forEach(function(point) {
-                painPointsHtml += '<li>' + point + '</li>';
-            });
-            painPointsHtml += '</ul>';
-            document.getElementById('painPoints').innerHTML = painPointsHtml;
+            var painPoints = data.pain_points || [];
+            var painsHtml = '';
+            if (painPoints.length > 0) {
+                painPoints.forEach(function(point) {
+                    var issue = typeof point === 'object' ? point.issue : point;
+                    var explanation = typeof point === 'object' ? point.explanation : '';
+                    painsHtml += '<div class="pain-item"><div class="issue">' + issue + '</div>';
+                    if (explanation) painsHtml += '<div class="explanation">' + explanation + '</div>';
+                    painsHtml += '</div>';
+                });
+            } else {
+                painsHtml = '<div style="color:var(--text-secondary);padding:12px">暂无明显痛点</div>';
+            }
+            document.getElementById('painPoints').innerHTML = painsHtml;
 
-            // 情绪变化
-            document.getElementById('emotionTrend').textContent = analysis.emotion_trend;
+            // 情绪时间线
+            var timeline = data.emotion_timeline || [];
+            var timelineHtml = '';
+            if (timeline.length > 0) {
+                timeline.forEach(function(item) {
+                    var stage = item.stage || '';
+                    var emoji = item.emoji || '😊';
+                    var mood = item.mood || '';
+                    var desc = item.description || '';
+                    timelineHtml += '<div class="timeline-item"><span class="emoji">' + emoji + '</span><span class="stage">' + stage + '</span> - <span class="mood">' + mood + '</span>';
+                    if (desc) timelineHtml += '<div class="description">' + desc + '</div>';
+                    timelineHtml += '</div>';
+                });
+            } else {
+                timelineHtml = '<div style="color:var(--text-secondary);padding:12px">暂无情绪变化记录</div>';
+            }
+            document.getElementById('emotionTimeline').innerHTML = timelineHtml;
 
-            // 行动建议
-            var suggestionsHtml = '<ul>';
-            analysis.action_suggestions.forEach(function(suggestion) {
-                suggestionsHtml += '<li>' + suggestion + '</li>';
-            });
-            suggestionsHtml += '</ul>';
-            document.getElementById('actionSuggestions').innerHTML = suggestionsHtml;
+            // 销售表现
+            var perf = data.sales_performance || null;
+            if (perf) {
+                var perfLabels = {
+                    'need_digging': '需求挖掘',
+                    'product_intro': '产品介绍',
+                    'value_building': '价值塑造',
+                    'objection_handling': '异议处理',
+                    'pricing_strategy': '报价策略',
+                    'closing_push': '成交推进',
+                    'professionalism': '专业程度',
+                    'communication': '沟通技巧'
+                };
+                var perfHtml = '';
+                var radarData = [];
+                var radarLabels = [];
+                for (var key in perfLabels) {
+                    if (key !== 'overall_score' && perf[key] !== undefined) {
+                        var scoreVal = perf[key];
+                        var barClass = scoreVal >= 80 ? 'progress-success' : (scoreVal >= 60 ? 'progress-warning' : 'progress-error');
+                        perfHtml += '<div class="perf-item"><div class="perf-item-header"><span class="perf-item-label">' + perfLabels[key] + '</span><span class="perf-item-score">' + scoreVal + '</span></div><div class="perf-bar"><div class="perf-bar-fill ' + barClass + '" style="width:' + scoreVal + '%"></div></div></div>';
+                        radarData.push(scoreVal);
+                        radarLabels.push(perfLabels[key]);
+                    }
+                }
+                document.getElementById('performanceGrid').innerHTML = perfHtml;
+
+                // 渲染雷达图
+                renderRadarChart(radarLabels, radarData);
+            } else {
+                document.getElementById('salesPerformanceSection').innerHTML = '<div style="color:var(--text-secondary);padding:20px;text-align:center">暂无销售表现数据</div>';
+            }
+
+            // 销售亮点
+            var highlights = data.sales_highlights || [];
+            var highlightsHtml = '';
+            if (highlights.length > 0) {
+                highlights.forEach(function(h) {
+                    var point = typeof h === 'object' ? h.point : h;
+                    var explanation = typeof h === 'object' ? h.explanation : '';
+                    highlightsHtml += '<div class="highlight-item"><span class="check">✔</span><div><div class="point">' + point + '</div>';
+                    if (explanation) highlightsHtml += '<div class="explanation">' + explanation + '</div>';
+                    highlightsHtml += '</div></div>';
+                });
+            } else {
+                highlightsHtml = '<div style="color:var(--text-secondary);padding:12px">暂无亮点记录</div>';
+            }
+            document.getElementById('salesHighlights').innerHTML = highlightsHtml;
 
             // 风险预警
-            var riskCard = document.getElementById('riskCard');
-            if (analysis.risks && analysis.risks.length > 0) {
-                riskCard.style.display = 'block';
-                var risksHtml = '';
-                analysis.risks.forEach(function(risk) {
-                    risksHtml += '<div class="risk-item"><span class="risk-icon">⚠️</span><span>' + risk + '</span></div>';
+            var risks = data.risk_warnings || data.risks || [];
+            var risksHtml = '';
+            if (risks.length > 0) {
+                risks.forEach(function(r) {
+                    var riskName = typeof r === 'object' ? r.risk : r;
+                    var level = typeof r === 'object' ? (r.level || 'low') : 'low';
+                    var suggestion = typeof r === 'object' ? r.suggestion : '';
+                    risksHtml += '<div class="risk-item"><span class="warning-icon">⚠</span><div class="risk-text"><div class="risk-name">' + riskName + '</div>';
+                    if (suggestion) risksHtml += '<div class="suggestion">' + suggestion + '</div>';
+                    risksHtml += '</div><span class="risk-level ' + level + '">' + (level === 'high' ? '高风险' : (level === 'medium' ? '中风险' : '低风险')) + '</span></div>';
                 });
-                document.getElementById('riskWarnings').innerHTML = risksHtml;
             } else {
-                riskCard.style.display = 'none';
+                risksHtml = '<div class="no-risk"><span class="icon">✓</span><span>暂无明显风险</span></div>';
             }
+            document.getElementById('riskWarnings').innerHTML = risksHtml;
+
+            // 行动建议
+            var actions = data.action_suggestions || data.suggestions || [];
+            var actionsHtml = '';
+            if (actions.length > 0) {
+                actions.forEach(function(a) {
+                    var actionText = typeof a === 'object' ? a.action : a;
+                    var priority = typeof a === 'object' ? (a.priority || 'medium') : 'medium';
+                    var priorityText = priority === 'high' ? '高优先级' : (priority === 'low' ? '低优先级' : '中优先级');
+                    actionsHtml += '<div class="action-item"><span class="priority"><span class="priority-tag ' + priority + '">' + priorityText + '</span></span><span class="action-text">' + actionText + '</span></div>';
+                });
+            } else {
+                actionsHtml = '<div style="color:var(--text-secondary);padding:12px">暂无行动建议</div>';
+            }
+            document.getElementById('actionSuggestions').innerHTML = actionsHtml;
 
             // 显示结果区域
             document.getElementById('resultSection').style.display = 'block';
             document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 渲染雷达图
+        var radarChartInstance = null;
+        function renderRadarChart(labels, data) {
+            var ctx = document.getElementById('radarChart');
+            if (!ctx) return;
+
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+
+            if (typeof Chart === 'undefined') {
+                document.querySelector('.radar-chart-container').innerHTML = '<div style="color:var(--text-secondary);text-align:center;padding:20px">图表加载中...</div>';
+                return;
+            }
+
+            radarChartInstance = new Chart(ctx.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '销售表现',
+                        data: data,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                font: { size: 10 }
+                            },
+                            pointLabels: {
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
         }
 
         // 保存到历史记录（已通过API自动保存，这里只是跳转）
@@ -442,11 +867,98 @@
         function copyResult() {
             if (!currentResult) return;
 
-            var text = '分析结果\n\n';
-            text += '意向度: ' + (currentResult.analysis.intent === 'high' ? '高' : (currentResult.analysis.intent === 'medium' ? '中' : '低')) + '\n\n';
-            text += '关键需求:\n' + currentResult.analysis.key_needs.map(function(n) { return '- ' + n; }).join('\n') + '\n\n';
-            text += '客户痛点:\n' + currentResult.analysis.pain_points.map(function(p) { return '- ' + p; }).join('\n') + '\n\n';
-            text += '行动建议:\n' + currentResult.analysis.action_suggestions.map(function(s) { return '- ' + s; }).join('\n');
+            // 兼容新旧格式
+            var data = (currentResult.analysis && Object.keys(currentResult.analysis).length > 0) ? currentResult.analysis : currentResult;
+            var intent = data.intent || 'medium';
+            var leadScore = data.lead_score || data.intent_score || 50;
+            var closingProb = data.closing_probability || (leadScore - 5);
+            var profile = data.customer_profile || {};
+            var keyNeeds = data.key_needs || [];
+            var painPoints = data.pain_points || [];
+            var risks = data.risk_warnings || data.risks || [];
+            var actions = data.action_suggestions || data.suggestions || [];
+            var highlights = data.sales_highlights || [];
+            var aiTags = data.ai_tags || data.keywords || [];
+
+            var text = '【销售AI分析报告】\n\n';
+            text += '━━━━━━━━ 客户意向度 ━━━━━━━━\n';
+            text += 'Lead Score: ' + Math.round(leadScore) + '/100\n';
+            text += '成交概率: ' + Math.round(closingProb) + '%\n';
+            text += '意向等级: ' + (intent === 'high' ? '高意向' : (intent === 'medium' ? '中意向' : '低意向')) + '\n\n';
+
+            if (data.score_reason) text += '评分依据: ' + data.score_reason + '\n\n';
+
+            text += '━━━━━━━━ 核心结论 ━━━━━━━━\n';
+            text += (currentResult.summary_brief || data.summary_brief || '无') + '\n\n';
+
+            if (profile.types && profile.types.length) {
+                text += '━━━━━━━━ 客户画像 ━━━━━━━━\n';
+                text += '客户类型: ' + profile.types.join('、') + '\n';
+                if (profile.characteristics && profile.characteristics.length) {
+                    text += '消费特点: ' + profile.characteristics.join('、') + '\n';
+                }
+                text += '\n';
+            }
+
+            text += '━━━━━━━━ 关键需求 ━━━━━━━━\n';
+            if (keyNeeds.length > 0) {
+                keyNeeds.forEach(function(n) {
+                    var text = typeof n === 'object' ? n.text : n;
+                    var imp = typeof n === 'object' ? (n.importance || 3) : 3;
+                    text += '★'.repeat(imp) + ' ' + text + '\n';
+                });
+            } else {
+                text += '暂无明确需求\n';
+            }
+            text += '\n';
+
+            text += '━━━━━━━━ 客户痛点 ━━━━━━━━\n';
+            if (painPoints.length > 0) {
+                painPoints.forEach(function(p) {
+                    var issue = typeof p === 'object' ? p.issue : p;
+                    var exp = typeof p === 'object' ? p.explanation : '';
+                    text += '• ' + issue + (exp ? ': ' + exp : '') + '\n';
+                });
+            } else {
+                text += '暂无明显痛点\n';
+            }
+            text += '\n';
+
+            text += '━━━━━━━━ 风险预警 ━━━━━━━━\n';
+            if (risks.length > 0) {
+                risks.forEach(function(r) {
+                    var riskName = typeof r === 'object' ? r.risk : r;
+                    var level = typeof r === 'object' ? r.level : 'low';
+                    text += '[风险' + level.toUpperCase() + '] ' + riskName + '\n';
+                });
+            } else {
+                text += '暂无明显风险\n';
+            }
+            text += '\n';
+
+            text += '━━━━━━━━ 行动建议 ━━━━━━━━\n';
+            if (actions.length > 0) {
+                actions.forEach(function(a) {
+                    var actionText = typeof a === 'object' ? a.action : a;
+                    var priority = typeof a === 'object' ? a.priority : 'medium';
+                    text += '[' + (priority === 'high' ? '高优先' : (priority === 'low' ? '低优先' : '中优先')) + '] ' + actionText + '\n';
+                });
+            } else {
+                text += '暂无行动建议\n';
+            }
+            text += '\n';
+
+            if (aiTags.length > 0) {
+                text += '━━━━━━━━ AI标签 ━━━━━━━━\n';
+                text += aiTags.join(' ') + '\n\n';
+            }
+
+            if (currentResult.summary_detail || data.summary_detail) {
+                text += '━━━━━━━━ 详细分析 ━━━━━━━━\n';
+                text += (currentResult.summary_detail || data.summary_detail) + '\n';
+            }
+
+            text += '\n━━━━━━━━━━━━━━━\n由智析销售AI生成';
 
             navigator.clipboard.writeText(text).then(function() {
                 showToast('已复制到剪贴板', 'success');

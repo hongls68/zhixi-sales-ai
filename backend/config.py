@@ -26,7 +26,7 @@ AI_PROVIDER = os.getenv("AI_PROVIDER", "api")
 # 兼容OpenAI的API配置
 API_BASE_URL = os.getenv("API_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1")
 API_KEY = os.getenv("API_KEY", "tp-c8wqvgrfoaa6e721ii615h8tgat0b859p28gslczbijin7ea")
-API_MODEL = os.getenv("API_MODEL", "deepseek-chat")
+API_MODEL = os.getenv("API_MODEL", "mimo-v2.5-pro")
 
 # Ollama配置（本地开发，备用）
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
